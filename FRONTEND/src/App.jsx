@@ -90,10 +90,83 @@ export default function App() {
     <div className="app">
       <Header meta={data.meta} language={language} onLanguageChange={setLanguage} labels={labels[language]} />
       <main className="main-content" id="dashboard">
-        <div className="demo-notice" style={{ background: '#0a3d46', borderColor: '#19717e' }}>
-          <RadioTower size={17} style={{ color: '#26d0ce' }} />
-          <p><strong>Operational Early Warning Mode.</strong> Dual-Layer Real-Time Machine Learning System Active: Layer 1 Static Susceptibility &amp; Layer 2 Dynamic Meteorological Trigger.</p>
-          <span style={{ background: '#138b9c', color: '#fff' }}>ML LAYER 1 &amp; 2 ACTIVE</span>
+        {/* Interactive Mode Toggle Bar */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          background: '#0a3d46',
+          border: '1px solid #19717e',
+          borderRadius: '10px',
+          padding: '0.75rem 1.1rem',
+          marginBottom: '1rem',
+          color: '#fff'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <RadioTower size={18} style={{ color: '#26d0ce' }} />
+            <div>
+              <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>
+                <strong>Operational Early Warning Mode:</strong> Dual-Layer ML System Active (Static Susceptibility &amp; Dynamic Meteorological Trigger).
+              </p>
+              <span style={{ fontSize: '0.72rem', color: '#9ec8b9' }}>
+                Mode: {selectedDate === '2021-10-19' ? '🚨 Extreme Disaster Storm Simulation' : '🛰️ Live Satellite Telemetry Active'}
+              </span>
+            </div>
+          </div>
+
+          {/* Interactive Toggle Switch */}
+          <div style={{
+            display: 'flex',
+            background: 'rgba(0, 0, 0, 0.3)',
+            padding: '3px',
+            borderRadius: '8px',
+            border: '1px solid rgba(255, 255, 255, 0.15)'
+          }}>
+            <button
+              type="button"
+              onClick={() => handleSelectDate('2021-05-15')}
+              style={{
+                background: selectedDate !== '2021-10-19' ? '#097969' : 'transparent',
+                color: '#fff',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.2s ease',
+                boxShadow: selectedDate !== '2021-10-19' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+              }}
+            >
+              🛰️ Live Satellite Radar
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectDate('2021-10-19')}
+              style={{
+                background: selectedDate === '2021-10-19' ? '#d7191c' : 'transparent',
+                color: '#fff',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.2s ease',
+                boxShadow: selectedDate === '2021-10-19' ? '0 2px 8px rgba(215, 25, 28, 0.4)' : 'none'
+              }}
+            >
+              🚨 Simulate Disaster Storm
+            </button>
+          </div>
         </div>
 
         {/* Feature 1: The Time Machine Monsoon Slider */}
