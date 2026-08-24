@@ -21,6 +21,7 @@ const labels = {
 export default function App() {
   const [data, setData] = useState(null)
   const [selectedCell, setSelectedCell] = useState(null)
+  const [telemetryMode, setTelemetryMode] = useState('live') // 'live' or 'storm'
   const [selectedDate, setSelectedDate] = useState('2021-10-19')
   const [inspectedRoad, setInspectedRoad] = useState(null)
   const [language, setLanguage] = useState('en')
@@ -31,9 +32,6 @@ export default function App() {
     const fetchData = () => {
       api.getDashboard().then((dashboard) => {
         setData(dashboard)
-        if (!selectedDate && dashboard.milestones && dashboard.milestones.length > 0) {
-          setSelectedDate(dashboard.milestones[dashboard.milestones.length - 1].date)
-        }
         if (!selectedCell && dashboard.riskCells && dashboard.riskCells.length > 0) {
           setSelectedCell(dashboard.riskCells[0])
         }
@@ -44,19 +42,33 @@ export default function App() {
     // Auto-poll live cloud radar feeds every 60 seconds
     const pollInterval = setInterval(fetchData, 60000)
     return () => clearInterval(pollInterval)
-  }, [selectedDate, selectedCell])
+  }, [selectedCell])
 
   const closeReport = useCallback(() => setReportOpen(false), [])
 
   const handleSelectDate = (date) => {
     setSelectedDate(date)
+    setTelemetryMode('timeline')
     if (data && data.timelineSnapshots && data.timelineSnapshots[date]) {
       const snap = data.timelineSnapshots[date]
-      // Preserve currently selected cell ID if present in new snapshot
       if (selectedCell) {
         const found = snap.riskCells.find((c) => c.cell_id === selectedCell.cell_id)
         if (found) setSelectedCell(found)
       }
+    }
+  }
+
+  const switchMode = (mode) => {
+    setTelemetryMode(mode)
+    if (mode === 'live') {
+      if (data && data.riskCells) {
+        if (selectedCell) {
+          const found = data.riskCells.find((c) => c.cell_id === selectedCell.cell_id)
+          if (found) setSelectedCell(found)
+        }
+      }
+    } else if (mode === 'storm') {
+      handleSelectDate('2021-10-19')
     }
   }
 
@@ -75,16 +87,23 @@ export default function App() {
     return <main className="loading-screen"><div className="loading-mark"><Gauge size={26} /></div><strong>Preparing risk monitoring console</strong><span>Loading live ML early warning feeds…</span></main>
   }
 
-  // Active snapshot calculation based on timeline selection
-  const currentSnapshot = (data.timelineSnapshots && data.timelineSnapshots[selectedDate]) || null
-  const currentRiskCells = currentSnapshot ? currentSnapshot.riskCells : data.riskCells
-  const currentMetaSummary = currentSnapshot ? {
-    severe_risk_cells: currentSnapshot.meta.severe_count,
-    high_risk_cells: currentSnapshot.meta.high_count,
-    roads_at_risk: currentSnapshot.meta.severe_count > 500 ? 5 : currentSnapshot.meta.severe_count > 100 ? 3 : 0,
-    settlements_at_risk: currentSnapshot.meta.severe_count > 500 ? 7 : 2,
-    weather_trigger: `NASA IMERG Rain (${currentSnapshot.meta.weather_summary.rainfall_3d} mm 3d) & SMAP Saturation (${currentSnapshot.meta.weather_summary.soil_moisture}%)`
-  } : data.meta.summary
+  // Active snapshot calculation based on mode & timeline selection
+  let currentRiskCells = data.riskCells
+  let currentMetaSummary = data.meta.summary
+
+  if (telemetryMode === 'storm' || telemetryMode === 'timeline') {
+    const snap = (data.timelineSnapshots && data.timelineSnapshots[selectedDate]) || null
+    if (snap) {
+      currentRiskCells = snap.riskCells
+      currentMetaSummary = {
+        severe_risk_cells: snap.meta.severe_count,
+        high_risk_cells: snap.meta.high_count,
+        roads_at_risk: snap.meta.severe_count > 500 ? 5 : snap.meta.severe_count > 100 ? 3 : 0,
+        settlements_at_risk: snap.meta.severe_count > 500 ? 7 : 2,
+        weather_trigger: `NASA IMERG Rain (${snap.meta.weather_summary.rainfall_3d} mm 3d) & SMAP Saturation (${snap.meta.weather_summary.soil_moisture}%)`
+      }
+    }
+  }
 
   return (
     <div className="app">
@@ -111,7 +130,7 @@ export default function App() {
                 <strong>Operational Early Warning Mode:</strong> Dual-Layer ML System Active (Static Susceptibility &amp; Dynamic Meteorological Trigger).
               </p>
               <span style={{ fontSize: '0.72rem', color: '#9ec8b9' }}>
-                Mode: {selectedDate === '2021-10-19' ? '🚨 Extreme Disaster Storm Simulation' : '🛰️ Live Satellite Telemetry Active'}
+                Mode: {telemetryMode === 'live' ? '🛰️ Real-Time Live Satellite Telemetry Active (Open-Meteo Feed)' : '🚨 Extreme Disaster Storm Simulation (19 Oct)'}
               </span>
             </div>
           </div>
@@ -126,9 +145,9 @@ export default function App() {
           }}>
             <button
               type="button"
-              onClick={() => handleSelectDate('2021-05-15')}
+              onClick={() => switchMode('live')}
               style={{
-                background: selectedDate !== '2021-10-19' ? '#097969' : 'transparent',
+                background: telemetryMode === 'live' ? '#097969' : 'transparent',
                 color: '#fff',
                 border: 'none',
                 padding: '6px 14px',
@@ -140,16 +159,16 @@ export default function App() {
                 alignItems: 'center',
                 gap: '5px',
                 transition: 'all 0.2s ease',
-                boxShadow: selectedDate !== '2021-10-19' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
+                boxShadow: telemetryMode === 'live' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
               }}
             >
-              🛰️ Live Satellite Radar
+              🛰️ Live Satellite Radar (Today)
             </button>
             <button
               type="button"
-              onClick={() => handleSelectDate('2021-10-19')}
+              onClick={() => switchMode('storm')}
               style={{
-                background: selectedDate === '2021-10-19' ? '#d7191c' : 'transparent',
+                background: telemetryMode !== 'live' ? '#d7191c' : 'transparent',
                 color: '#fff',
                 border: 'none',
                 padding: '6px 14px',
@@ -161,10 +180,10 @@ export default function App() {
                 alignItems: 'center',
                 gap: '5px',
                 transition: 'all 0.2s ease',
-                boxShadow: selectedDate === '2021-10-19' ? '0 2px 8px rgba(215, 25, 28, 0.4)' : 'none'
+                boxShadow: telemetryMode !== 'live' ? '0 2px 8px rgba(215, 25, 28, 0.4)' : 'none'
               }}
             >
-              🚨 Simulate Disaster Storm
+              🚨 Simulate Disaster Storm (19 Oct)
             </button>
           </div>
         </div>
