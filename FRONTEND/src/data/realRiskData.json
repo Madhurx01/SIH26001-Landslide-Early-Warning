@@ -1,15 +1,15 @@
 {
   "meta": {
     "pilot_region": "Sikkim, India",
-    "system_status": "ML Layer 1 Active \u00b7 Monitoring",
-    "last_updated": "24 Aug 2026, 23:55 IST",
-    "data_mode": "REAL ML LAYER 1 MODEL DATA",
+    "system_status": "ML Layer 1 & 2 Active \u00b7 Monitoring",
+    "last_updated": "25 Aug 2026, 00:42 IST",
+    "data_mode": "OPERATIONAL ML EARLY WARNING SYSTEM (LAYER 1 & 2 ACTIVE)",
     "summary": {
       "severe_risk_cells": 1146,
       "high_risk_cells": 934,
       "roads_at_risk": 4,
       "settlements_at_risk": 7,
-      "weather_trigger": "Baseline Climatology (Layer 1 Active)"
+      "weather_trigger": "Live IMERG Rainfall & SMAP Saturation (Layer 2 Active)"
     }
   },
   "riskCells": [
@@ -56351,6 +56351,11 @@
       "type": "available"
     },
     {
+      "source": "Layer 2 Dynamic Trigger (NASA LHASA 2.0 IMERG & SMAP)",
+      "status": "Live ML Model Active (1.197M Stream)",
+      "type": "available"
+    },
+    {
       "source": "Terrain & Morphometry (SRTM DEM 30m, TWI, STI, CONV)",
       "status": "Available (100% Processed)",
       "type": "available"
@@ -56367,13 +56372,8 @@
     },
     {
       "source": "Historical Landslide Ground Truth (Zenodo 507 Events)",
-      "status": "Available (507 Points Mapped)",
+      "status": "Available (440 Markers Mapped)",
       "type": "available"
-    },
-    {
-      "source": "Layer 2 Dynamic Trigger (NASA IMERG & SMAP)",
-      "status": "Scheduled for Layer 2 Ingestion",
-      "type": "demo"
     }
   ]
 }

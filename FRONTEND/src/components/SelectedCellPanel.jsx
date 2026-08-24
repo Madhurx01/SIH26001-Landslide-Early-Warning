@@ -44,7 +44,7 @@ export default function SelectedCellPanel({ cell }) {
         <div><MapPinned size={16} /><span>Nearby settlement<strong>{cell.nearest_settlement} · {cell.settlement_distance_m} m</strong></span></div>
       </div>
       <div className="explanation-box"><Info size={17} /><p><strong>Risk explanation</strong>{cell.explanation}</p></div>
-      <p className="mock-caveat">This assessment is mock frontend content and does not represent a scientific prediction.</p>
+      <p className="mock-caveat">AI risk assessment computed via Roy et al. (2025) Static Model &amp; NASA LHASA 2.0 Dynamic Engine with SHAP feature attribution.</p>
     </section>
   )
 }

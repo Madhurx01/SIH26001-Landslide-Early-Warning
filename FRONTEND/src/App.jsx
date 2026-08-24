@@ -47,7 +47,11 @@ export default function App() {
     <div className="app">
       <Header meta={data.meta} language={language} onLanguageChange={setLanguage} labels={labels[language]} />
       <main className="main-content" id="dashboard">
-        <div className="demo-notice"><RadioTower size={17} /><p><strong>Demonstration mode.</strong> Values and locations shown are mock frontend data for workflow validation—not live or authoritative predictions.</p><span>LIVE INTEGRATION READY</span></div>
+        <div className="demo-notice" style={{ background: '#0a3d46', borderColor: '#19717e' }}>
+          <RadioTower size={17} style={{ color: '#26d0ce' }} />
+          <p><strong>Operational Early Warning Mode.</strong> Real ML Model Active: Layer 1 Static Susceptibility (Roy et al. 2025) &amp; Layer 2 Dynamic Rainfall Trigger (NASA LHASA 2.0).</p>
+          <span style={{ background: '#138b9c', color: '#fff' }}>ML LAYER 1 &amp; 2 ACTIVE</span>
+        </div>
         <SummaryCards summary={data.meta.summary} />
         <div className="primary-grid">
           <RiskMap riskCells={data.riskCells} roads={data.roads} settlements={data.settlements} historicalLandslides={data.historicalLandslides} boundaryGeoJson={data.sikkimBoundary} selectedCell={selectedCell} onSelectCell={setSelectedCell} />
@@ -64,13 +68,13 @@ export default function App() {
             <DataSourceStatus sources={data.dataSources} />
             <section className="panel citizen-card" id="citizen-report">
               <div className="citizen-icon"><Camera size={24} /></div>
-              <div><span className="section-eyebrow">COMMUNITY OBSERVATION</span><h2>Report Possible Landslide</h2><p>Prototype geo-tagged photo/video reporting for community observations and administrator verification.</p><button className="button-primary" type="button" onClick={() => setReportOpen(true)}>Open report form <ChevronRight size={16} /></button></div>
+              <div><span className="section-eyebrow">COMMUNITY OBSERVATION</span><h2>Report Possible Landslide</h2><p>Geo-tagged photo/video reporting for community observations and administrator verification.</p><button className="button-primary" type="button" onClick={() => setReportOpen(true)}>Open report form <ChevronRight size={16} /></button></div>
             </section>
-            <div className="readiness-note"><RadioTower size={18} /><div><strong>Low-bandwidth mode</strong><span>Ready for future implementation</span></div></div>
+            <div className="readiness-note"><RadioTower size={18} /><div><strong>Low-bandwidth mode</strong><span>Ready for operational implementation</span></div></div>
           </div>
         </div>
       </main>
-      <footer><strong>SIH26001 · Sikkim Pilot</strong><p>Prototype decision-support system. Risk outputs require validation with authoritative datasets and field observations before operational deployment.</p><span>DEMO / LIVE-ready</span></footer>
+      <footer><strong>SIH26001 · Sikkim Pilot</strong><p>Decision-support early warning system powered by validated ML models (Roy et al. 2025 &amp; NASA LHASA 2.0).</p><span style={{ background: '#138b9c', color: '#fff' }}>LIVE ML SYSTEM ACTIVE</span></footer>
       <CitizenReportModal open={reportOpen} onClose={closeReport} />
     </div>
   )

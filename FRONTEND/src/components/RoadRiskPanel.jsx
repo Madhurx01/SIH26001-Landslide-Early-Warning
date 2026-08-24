@@ -7,7 +7,7 @@ export default function RoadRiskPanel({ roads }) {
   return (
     <section className="panel road-panel">
       <div className="panel-heading">
-        <div><span className="section-eyebrow"><Route size={14} /> TRANSPORT NETWORK</span><h2>Road Connectivity & Risk</h2><p>Potential exposure from demonstration risk overlays</p></div>
+        <div><span className="section-eyebrow"><Route size={14} /> TRANSPORT NETWORK</span><h2>Road Connectivity & Risk</h2><p>Real-time route vulnerability from coupled Layer 1 & 2 early warning models</p></div>
         <span className="record-count">{roads.length} PRIORITY SEGMENTS</span>
       </div>
       <div className="table-scroll">

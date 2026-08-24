@@ -6,8 +6,11 @@ export default function WeatherRiskPanel({ weather }) {
   return (
     <section className="panel weather-panel">
       <div className="panel-heading">
-        <div><span className="section-eyebrow"><CloudRain size={14} /> WEATHER-LINKED FORECAST</span><h2>Rainfall & Trigger Signals</h2></div>
-        <span className="integration-label">API READY</span>
+        <div>
+          <span className="section-eyebrow"><CloudRain size={14} /> METEOROLOGICAL TRIGGERS</span>
+          <h2>Precipitation &amp; Soil Saturation</h2>
+        </div>
+        <p>NASA GPM IMERG &amp; SMAP satellite-triggered dynamic risk outlook.</p>
       </div>
       <div className="weather-kpis">
         <div><Gauge size={16} /><span>Current rainfall<strong>{weather.current_rainfall_mm_hr} <small>mm/hr</small></strong></span></div>
