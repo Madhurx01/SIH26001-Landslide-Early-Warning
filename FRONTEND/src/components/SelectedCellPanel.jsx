@@ -115,7 +115,7 @@ export default function SelectedCellPanel({ cell }) {
       </div>
 
       <div className="explanation-box"><Info size={17} /><p><strong>AI Risk Synthesis</strong>{cell.explanation}</p></div>
-      <p className="mock-caveat">AI risk assessment computed via Roy et al. (2025) Static Model &amp; NASA LHASA 2.0 Dynamic Engine with SHAP feature attribution.</p>
+      <p className="mock-caveat">AI risk assessment computed via Dual-Layer Machine Learning Engine with TreeSHAP explainability.</p>
     </section>
   )
 }

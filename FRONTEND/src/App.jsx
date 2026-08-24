@@ -83,7 +83,7 @@ export default function App() {
       <main className="main-content" id="dashboard">
         <div className="demo-notice" style={{ background: '#0a3d46', borderColor: '#19717e' }}>
           <RadioTower size={17} style={{ color: '#26d0ce' }} />
-          <p><strong>Operational Early Warning Mode.</strong> Real ML Model Active: Layer 1 Static Susceptibility (Roy et al. 2025) &amp; Layer 2 Dynamic Rainfall Trigger (NASA LHASA 2.0).</p>
+          <p><strong>Operational Early Warning Mode.</strong> Dual-Layer Real-Time Machine Learning System Active: Layer 1 Static Susceptibility &amp; Layer 2 Dynamic Meteorological Trigger.</p>
           <span style={{ background: '#138b9c', color: '#fff' }}>ML LAYER 1 &amp; 2 ACTIVE</span>
         </div>
 
@@ -154,7 +154,7 @@ export default function App() {
 
       <footer>
         <strong>SIH26001 · Sikkim Pilot</strong>
-        <p>Decision-support early warning system powered by validated ML models (Roy et al. 2025 &amp; NASA LHASA 2.0).</p>
+        <p>Decision-support early warning system powered by Dual-Layer Machine Learning (Static Susceptibility &amp; Dynamic Meteorological Radar).</p>
         <span style={{ background: '#138b9c', color: '#fff' }}>LIVE ML SYSTEM ACTIVE</span>
       </footer>
 
