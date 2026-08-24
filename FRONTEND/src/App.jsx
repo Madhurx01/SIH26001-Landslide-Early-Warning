@@ -88,22 +88,15 @@ export default function App() {
   }
 
   // Active snapshot calculation based on mode & timeline selection
-  let currentRiskCells = data.riskCells
-  let currentMetaSummary = data.meta.summary
-
-  if (telemetryMode === 'storm' || telemetryMode === 'timeline') {
-    const snap = (data.timelineSnapshots && data.timelineSnapshots[selectedDate]) || null
-    if (snap) {
-      currentRiskCells = snap.riskCells
-      currentMetaSummary = {
-        severe_risk_cells: snap.meta.severe_count,
-        high_risk_cells: snap.meta.high_count,
-        roads_at_risk: snap.meta.severe_count > 500 ? 5 : snap.meta.severe_count > 100 ? 3 : 0,
-        settlements_at_risk: snap.meta.severe_count > 500 ? 7 : 2,
-        weather_trigger: `NASA IMERG Rain (${snap.meta.weather_summary.rainfall_3d} mm 3d) & SMAP Saturation (${snap.meta.weather_summary.soil_moisture}%)`
-      }
-    }
-  }
+  const currentSnapshot = (data.timelineSnapshots && data.timelineSnapshots[selectedDate]) || null
+  const currentRiskCells = (telemetryMode === 'live') ? data.riskCells : (currentSnapshot ? currentSnapshot.riskCells : data.riskCells)
+  const currentMetaSummary = (telemetryMode === 'live') ? data.meta.summary : (currentSnapshot ? {
+    severe_risk_cells: currentSnapshot.meta.severe_count,
+    high_risk_cells: currentSnapshot.meta.high_count,
+    roads_at_risk: currentSnapshot.meta.severe_count > 500 ? 5 : currentSnapshot.meta.severe_count > 100 ? 3 : 0,
+    settlements_at_risk: currentSnapshot.meta.severe_count > 500 ? 7 : 2,
+    weather_trigger: `NASA IMERG Rain (${currentSnapshot.meta.weather_summary.rainfall_3d} mm 3d) & SMAP Saturation (${currentSnapshot.meta.weather_summary.soil_moisture}%)`
+  } : data.meta.summary)
 
   return (
     <div className="app">
