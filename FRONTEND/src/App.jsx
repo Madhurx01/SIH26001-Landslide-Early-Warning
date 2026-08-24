@@ -10,7 +10,6 @@ import RoadRiskPanel from './components/RoadRiskPanel'
 import HighwayInspectorModal from './components/HighwayInspectorModal'
 import EmergencyPriorityPanel from './components/EmergencyPriorityPanel'
 import AlertsPanel from './components/AlertsPanel'
-import DataSourceStatus from './components/DataSourceStatus'
 import CitizenReportModal from './components/CitizenReportModal'
 import api from './services/api'
 
@@ -131,7 +130,6 @@ export default function App() {
         <div className="operations-grid">
           <EmergencyPriorityPanel priorities={data.emergencyPriorities} />
           <div className="support-column">
-            <DataSourceStatus sources={data.dataSources} />
             <section className="panel citizen-card" id="citizen-report">
               <div className="citizen-icon"><Camera size={24} /></div>
               <div>
