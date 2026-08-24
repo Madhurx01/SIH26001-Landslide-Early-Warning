@@ -1,0 +1,111 @@
+{
+  "artifact_version": 2,
+  "context": "historical_replay",
+  "demo_date": "2021-10-19",
+  "demo_date_display": "19 Oct 2021",
+  "feature_count": 7390,
+  "artifact_alignment": {
+    "verified": true,
+    "verified_cell_count": 7390,
+    "risk_cell_ids_unique": true,
+    "dynamic_cell_ids_unique": true,
+    "exact_cell_id_set_match": true,
+    "replay_date_match": true
+  },
+  "risk_counts": {
+    "LOW": 5692,
+    "MODERATE": 1148,
+    "HIGH": 180,
+    "SEVERE": 370
+  },
+  "final_risk_score": {
+    "min": 4.14,
+    "max": 94.02,
+    "median": 25.0
+  },
+  "weather": {
+    "trigger_description": "Localized heavy rainfall",
+    "rainfall_1d_median_mm": 121.33,
+    "rainfall_1d_p95_mm": 223.08,
+    "rainfall_3d_median_mm": 189.83,
+    "rainfall_3d_p95_mm": 263.13,
+    "rainfall_7d_median_mm": 195.78,
+    "rainfall_7d_p95_mm": 266.86,
+    "soil_moisture_median": null,
+    "soil_moisture_valid_cells": 0,
+    "dynamic_trigger_median": 100.0,
+    "dynamic_trigger_p95": 100.0
+  },
+  "model": {
+    "static_model": "Random Forest",
+    "validation": "Untouched 10-km spatial-block test",
+    "pr_auc": 0.397,
+    "recall": 0.136,
+    "precision": 0.429,
+    "f1": 0.207,
+    "roc_auc": 0.944,
+    "accuracy_secondary": 0.938,
+    "candidate_validation_metrics": {
+      "random_forest": {
+        "decision_threshold": 0.5,
+        "precision": 0.43137254901960786,
+        "recall": 0.25,
+        "f1": 0.31654676258992803,
+        "pr_auc_average_precision": 0.40168225965033083,
+        "roc_auc": 0.9309704578536456,
+        "accuracy_secondary": 0.9350205198358413,
+        "confusion_matrix": {
+          "labels": [
+            0,
+            1
+          ],
+          "matrix": [
+            [
+              1345,
+              29
+            ],
+            [
+              66,
+              22
+            ]
+          ],
+          "tn": 1345,
+          "fp": 29,
+          "fn": 66,
+          "tp": 22
+        }
+      },
+      "xgboost": {
+        "decision_threshold": 0.5,
+        "precision": 0.36470588235294116,
+        "recall": 0.7045454545454546,
+        "f1": 0.4806201550387597,
+        "pr_auc_average_precision": 0.39694984339069245,
+        "roc_auc": 0.932488090512108,
+        "accuracy_secondary": 0.908344733242134,
+        "confusion_matrix": {
+          "labels": [
+            0,
+            1
+          ],
+          "matrix": [
+            [
+              1266,
+              108
+            ],
+            [
+              26,
+              62
+            ]
+          ],
+          "tn": 1266,
+          "fp": 108,
+          "fn": 26,
+          "tp": 62
+        }
+      }
+    },
+    "risk_engine": "Static susceptibility + rainfall/soil-moisture trigger",
+    "score_semantics": "MVP operational categories, not scientifically calibrated thresholds"
+  }
+}

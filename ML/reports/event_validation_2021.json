@@ -1,0 +1,88 @@
+{
+  "validation_type": "preliminary event-based validation; small exact-date sample",
+  "source_exact_dated_rows_all_years": 55,
+  "window": {
+    "start": "2021-05-11T00:00:00",
+    "end": "2021-10-19T00:00:00"
+  },
+  "valid_2021_event_records": 13,
+  "unique_event_dates": 11,
+  "unique_event_cells": 9,
+  "event_dates": [
+    "2021-05-18",
+    "2021-06-01",
+    "2021-06-05",
+    "2021-06-06",
+    "2021-06-08",
+    "2021-06-18",
+    "2021-08-01",
+    "2021-08-22",
+    "2021-08-23",
+    "2021-08-27",
+    "2021-10-19"
+  ],
+  "event_cells": [
+    "SKM_03196",
+    "SKM_05244",
+    "SKM_05257",
+    "SKM_05507",
+    "SKM_05508",
+    "SKM_05677",
+    "SKM_06021",
+    "SKM_06370",
+    "SKM_06549"
+  ],
+  "event_summary": {
+    "rainfall_1d": {
+      "mean": 37.17961401205797,
+      "median": 26.274999618530273,
+      "min": 1.3399999141693115,
+      "max": 132.6199951171875
+    },
+    "rainfall_3d": {
+      "mean": 75.22769018319937,
+      "median": 59.23999857902527,
+      "min": 6.804999828338623,
+      "max": 221.37999141216278
+    },
+    "rainfall_7d": {
+      "mean": 125.92807391515144,
+      "median": 116.99499464035034,
+      "min": 38.744999408721924,
+      "max": 230.5599916279316
+    },
+    "soil_moisture": {
+      "mean": null,
+      "median": null,
+      "min": null,
+      "max": null
+    },
+    "dynamic_trigger_score": {
+      "mean": 64.15655010566346,
+      "median": 66.83442593813884,
+      "min": 9.378917735788145,
+      "max": 100.0
+    },
+    "static_susceptibility": {
+      "mean": 77.90335684636821,
+      "median": 77.07019312449074,
+      "min": 64.25885865505407,
+      "max": 88.42228801974602
+    },
+    "final_risk_score": {
+      "mean": 63.38733726016491,
+      "median": 64.2869425357738,
+      "min": 33.02947708348189,
+      "max": 90.58256758342817
+    }
+  },
+  "background_comparison": "Each event row includes the median across all inventory-background/pseudo-negative cells on that exact date; these are not confirmed landslide-free controls.",
+  "demo_date_selection": "in-window GSI event date with highest event-cell final risk",
+  "demo_date": "2021-10-19T00:00:00",
+  "limitations": [
+    "Only exact GSI dates inside the real satellite window are used.",
+    "The sample is too small for claims of calibration or operational sensitivity.",
+    "Inventory background cells are pseudo-negatives and observation effort is spatially biased.",
+    "Satellite values are coarse observations assigned to 1-km analysis cells, not downscaled measurements."
+  ]
+}

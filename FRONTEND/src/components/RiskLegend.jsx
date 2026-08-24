@@ -7,7 +7,7 @@ export default function RiskLegend() {
       {Object.entries(severityConfig).map(([level, config]) => (
         <div key={level}><span style={{ backgroundColor: config.color }} />{level}</div>
       ))}
-      <small>Predicted risk · demo</small>
+      <small>Operational risk index · historical replay</small>
     </div>
   )
 }

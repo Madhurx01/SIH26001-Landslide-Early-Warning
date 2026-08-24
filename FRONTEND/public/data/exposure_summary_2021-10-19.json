@@ -1,0 +1,495 @@
+{
+  "demo_date": "2021-10-19",
+  "high_risk_cells": 180,
+  "severe_risk_cells": 370,
+  "unique_exposed_roads": 1967,
+  "total_exposed_road_length_km": 1966.07,
+  "exposed_vehicular_road_segments": 1967,
+  "unique_named_roads": 27,
+  "unnamed_vehicular_osm_ways": 1856,
+  "total_exposed_vehicular_road_length_km": 1966.07,
+  "vehicular_road_exposure_by_risk_level": {
+    "HIGH": {
+      "segments_by_maximum_risk": 572,
+      "affected_length_km": 661.783
+    },
+    "SEVERE": {
+      "segments_by_maximum_risk": 1395,
+      "affected_length_km": 1304.287
+    }
+  },
+  "risk_cells_with_vehicular_road": {
+    "total": 547,
+    "HIGH": 178,
+    "SEVERE": 369
+  },
+  "unique_exposed_settlements": 32,
+  "priority_1_count": 369,
+  "priority_2_count": 179,
+  "priority_3_count": 1,
+  "top_named_exposed_roads": [
+    {
+      "road_name": "Jelep Pass Highway",
+      "osm_segments": 3,
+      "affected_length_km": 40.82,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 91.316716,
+      "affected_cell_ids": [
+        "SKM_05786",
+        "SKM_06047",
+        "SKM_06134",
+        "SKM_06221",
+        "SKM_06308",
+        "SKM_06309",
+        "SKM_06392",
+        "SKM_06393",
+        "SKM_06548",
+        "SKM_06549",
+        "SKM_06550",
+        "SKM_06626",
+        "SKM_06627",
+        "SKM_06778",
+        "SKM_06782",
+        "SKM_06851"
+      ]
+    },
+    {
+      "road_name": "RANGPO-GANGTOK Rd",
+      "osm_segments": 1,
+      "affected_length_km": 6.091,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 90.777776,
+      "affected_cell_ids": [
+        "SKM_06602",
+        "SKM_06603",
+        "SKM_06759",
+        "SKM_06833",
+        "SKM_06905",
+        "SKM_06906",
+        "SKM_06979"
+      ]
+    },
+    {
+      "road_name": "Lower Burtuk Road",
+      "osm_segments": 1,
+      "affected_length_km": 3.023,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 90.582568,
+      "affected_cell_ids": [
+        "SKM_05340",
+        "SKM_05341",
+        "SKM_05424",
+        "SKM_05506",
+        "SKM_05507"
+      ]
+    },
+    {
+      "road_name": "Burtuk",
+      "osm_segments": 2,
+      "affected_length_km": 1.825,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 90.582568,
+      "affected_cell_ids": [
+        "SKM_05341",
+        "SKM_05424",
+        "SKM_05507"
+      ]
+    },
+    {
+      "road_name": "Baluakhani Road",
+      "osm_segments": 1,
+      "affected_length_km": 0.71,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 90.582568,
+      "affected_cell_ids": [
+        "SKM_05507"
+      ]
+    },
+    {
+      "road_name": "Baluakhani",
+      "osm_segments": 2,
+      "affected_length_km": 0.6,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 90.582568,
+      "affected_cell_ids": [
+        "SKM_05507",
+        "SKM_05590"
+      ]
+    },
+    {
+      "road_name": "Gangtok - Assam - Pakyong Road",
+      "osm_segments": 14,
+      "affected_length_km": 11.277,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 88.144602,
+      "affected_cell_ids": [
+        "SKM_05509",
+        "SKM_05590",
+        "SKM_05591",
+        "SKM_05594",
+        "SKM_05681",
+        "SKM_05942",
+        "SKM_06116",
+        "SKM_06376",
+        "SKM_06456"
+      ]
+    },
+    {
+      "road_name": "Majitar Railway Station Rd",
+      "osm_segments": 1,
+      "affected_length_km": 0.772,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 87.593661,
+      "affected_cell_ids": [
+        "SKM_06979"
+      ]
+    },
+    {
+      "road_name": "North Sikkim Highway",
+      "osm_segments": 61,
+      "affected_length_km": 68.486,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 87.012618,
+      "affected_cell_ids": [
+        "SKM_02198",
+        "SKM_02269",
+        "SKM_02340",
+        "SKM_02411",
+        "SKM_02412",
+        "SKM_02483",
+        "SKM_02553",
+        "SKM_02554",
+        "SKM_02624",
+        "SKM_02766",
+        "SKM_02909",
+        "SKM_02981",
+        "SKM_03053",
+        "SKM_03054",
+        "SKM_03123",
+        "SKM_03192",
+        "SKM_03263",
+        "SKM_03264",
+        "SKM_03481",
+        "SKM_03553",
+        "SKM_03623",
+        "SKM_03624",
+        "SKM_03763",
+        "SKM_03764",
+        "SKM_03834",
+        "SKM_04043",
+        "SKM_04044",
+        "SKM_04117",
+        "SKM_04263",
+        "SKM_04264",
+        "SKM_04338",
+        "SKM_04411",
+        "SKM_04630",
+        "SKM_04704",
+        "SKM_04710",
+        "SKM_04712",
+        "SKM_04777",
+        "SKM_04782",
+        "SKM_04784",
+        "SKM_04785",
+        "SKM_04852",
+        "SKM_04857",
+        "SKM_04859",
+        "SKM_04860",
+        "SKM_04861",
+        "SKM_04930",
+        "SKM_04932",
+        "SKM_05014",
+        "SKM_05015",
+        "SKM_05016",
+        "SKM_05094",
+        "SKM_05095",
+        "SKM_05175",
+        "SKM_05176",
+        "SKM_05177",
+        "SKM_05257"
+      ]
+    },
+    {
+      "road_name": "Rannipool - Rumtek - Sirwani Road",
+      "osm_segments": 1,
+      "affected_length_km": 4.382,
+      "maximum_risk_level": "SEVERE",
+      "maximum_final_risk_score": 86.619377,
+      "affected_cell_ids": [
+        "SKM_06021",
+        "SKM_06109",
+        "SKM_06280",
+        "SKM_06443"
+      ]
+    }
+  ],
+  "top_10_priority_locations": [
+    {
+      "priority": 1,
+      "cell_id": "SKM_06549",
+      "risk_level": "SEVERE",
+      "final_risk_score": 91.316716,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "Jelep Pass Highway"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_06759",
+      "risk_level": "SEVERE",
+      "final_risk_score": 90.777776,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "RANGPO-GANGTOK Rd"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_05507",
+      "risk_level": "SEVERE",
+      "final_risk_score": 90.582568,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "Baluakhani",
+        "Baluakhani Road",
+        "Burtuk",
+        "Lower Burtuk Road"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_06906",
+      "risk_level": "SEVERE",
+      "final_risk_score": 90.321062,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "RANGPO-GANGTOK Rd"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_06602",
+      "risk_level": "SEVERE",
+      "final_risk_score": 90.170203,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "RANGPO-GANGTOK Rd"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_05591",
+      "risk_level": "SEVERE",
+      "final_risk_score": 88.144602,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "Gangtok - Assam - Pakyong Road"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_06833",
+      "risk_level": "SEVERE",
+      "final_risk_score": 88.047222,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "RANGPO-GANGTOK Rd"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_06456",
+      "risk_level": "SEVERE",
+      "final_risk_score": 87.62246,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "Gangtok - Assam - Pakyong Road"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_06979",
+      "risk_level": "SEVERE",
+      "final_risk_score": 87.593661,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "Majitar Railway Station Rd",
+        "RANGPO-GANGTOK Rd"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    },
+    {
+      "priority": 1,
+      "cell_id": "SKM_05509",
+      "risk_level": "SEVERE",
+      "final_risk_score": 87.475922,
+      "has_road_exposure": true,
+      "has_settlement_exposure": false,
+      "road_names": [
+        "Gangtok - Assam - Pakyong Road"
+      ],
+      "settlement_names": [],
+      "recommended_action": "Field verification recommended; verify road condition where applicable; notify local authorities for readiness; monitor rainfall and slope conditions.",
+      "has_vehicular_road_exposure": true
+    }
+  ],
+  "road_classification": {
+    "retained_highway_classes": [
+      "living_street",
+      "primary",
+      "residential",
+      "secondary",
+      "secondary_link",
+      "service",
+      "tertiary",
+      "tertiary_link",
+      "trunk",
+      "unclassified"
+    ],
+    "conditional_service_rule": "service retained only when the OSM way has a real name or ref",
+    "fully_excluded_highway_classes": [
+      "bridleway",
+      "footway",
+      "path",
+      "pedestrian",
+      "steps",
+      "track",
+      "track_grade1",
+      "track_grade2",
+      "track_grade3",
+      "track_grade4",
+      "unknown"
+    ],
+    "excluded_service_rule": "unnamed and unreferenced service ways excluded",
+    "track_treatment": "excluded from main metrics; preserved in broad transport outputs",
+    "retained_class_metrics": {
+      "living_street": {
+        "osm_segments": 9,
+        "affected_length_km": 1.403
+      },
+      "primary": {
+        "osm_segments": 65,
+        "affected_length_km": 72.016
+      },
+      "residential": {
+        "osm_segments": 337,
+        "affected_length_km": 97.988
+      },
+      "secondary": {
+        "osm_segments": 58,
+        "affected_length_km": 117.311
+      },
+      "secondary_link": {
+        "osm_segments": 1,
+        "affected_length_km": 0.023
+      },
+      "service": {
+        "osm_segments": 1,
+        "affected_length_km": 0.42
+      },
+      "tertiary": {
+        "osm_segments": 216,
+        "affected_length_km": 374.251
+      },
+      "tertiary_link": {
+        "osm_segments": 2,
+        "affected_length_km": 0.019
+      },
+      "trunk": {
+        "osm_segments": 119,
+        "affected_length_km": 225.647
+      },
+      "unclassified": {
+        "osm_segments": 1159,
+        "affected_length_km": 1076.993
+      }
+    },
+    "excluded_class_metrics": {
+      "bridleway": {
+        "osm_segments": 1,
+        "affected_length_km": 0.071
+      },
+      "footway": {
+        "osm_segments": 193,
+        "affected_length_km": 29.437
+      },
+      "path": {
+        "osm_segments": 730,
+        "affected_length_km": 143.779
+      },
+      "pedestrian": {
+        "osm_segments": 8,
+        "affected_length_km": 1.272
+      },
+      "service": {
+        "osm_segments": 466,
+        "affected_length_km": 71.91
+      },
+      "steps": {
+        "osm_segments": 140,
+        "affected_length_km": 15.41
+      },
+      "track": {
+        "osm_segments": 182,
+        "affected_length_km": 65.682
+      },
+      "track_grade1": {
+        "osm_segments": 1,
+        "affected_length_km": 0.233
+      },
+      "track_grade2": {
+        "osm_segments": 4,
+        "affected_length_km": 3.495
+      },
+      "track_grade3": {
+        "osm_segments": 2,
+        "affected_length_km": 0.288
+      },
+      "track_grade4": {
+        "osm_segments": 1,
+        "affected_length_km": 1.708
+      },
+      "unknown": {
+        "osm_segments": 1,
+        "affected_length_km": 0.187
+      }
+    }
+  },
+  "interpretation": "POTENTIALLY EXPOSED TO ELEVATED LANDSLIDE RISK"
+}

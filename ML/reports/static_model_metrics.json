@@ -1,0 +1,172 @@
+{
+  "score_semantics": "uncalibrated susceptibility score; not probability",
+  "target_semantics": {
+    "positive": "cell present in the available GSI inventory",
+    "zero": "background/pseudo-negative; not confirmed landslide-free"
+  },
+  "features": [
+    "sikkim_fraction",
+    "elevation_mean_m",
+    "elevation_min_m",
+    "elevation_max_m",
+    "elevation_std_m",
+    "terrain_relief_m",
+    "slope_mean_deg",
+    "slope_max_deg",
+    "slope_std_deg",
+    "aspect_sin",
+    "aspect_cos",
+    "dominant_landcover_class",
+    "lc_tree_fraction",
+    "lc_shrub_fraction",
+    "lc_grass_fraction",
+    "lc_cropland_fraction",
+    "lc_builtup_fraction",
+    "lc_bare_fraction",
+    "lc_snow_ice_fraction",
+    "lc_water_fraction",
+    "lc_wetland_fraction",
+    "lc_moss_lichen_fraction",
+    "road_length_m",
+    "road_density_km_per_km2",
+    "distance_to_nearest_road_m",
+    "settlement_count",
+    "village_count",
+    "hamlet_count",
+    "town_count",
+    "city_count",
+    "distance_to_nearest_settlement_m"
+  ],
+  "target_distribution": {
+    "rows": 7390,
+    "positive_affected_cells": 456,
+    "background_pseudo_negative_cells": 6934,
+    "positive_fraction": 0.061705006765899864
+  },
+  "evaluation_design": {
+    "method": "nested deterministic spatial-group train/validation/untouched-test split",
+    "spatial_block_size_m": 10000.0,
+    "outer_test_split": "first fold of shuffled 5-fold stratified group split",
+    "inner_validation_split": "first fold of shuffled 4-fold stratified group split within outer development rows",
+    "selection_data": "validation only",
+    "test_usage": "selected model evaluated exactly once; never used for model selection",
+    "refit_scope": "train + validation after untouched test evaluation",
+    "limitation": "Inventory-derived pseudo-negatives and spatial sampling bias remain; this is not independent prospective validation."
+  },
+  "splits": {
+    "train": {
+      "rows": 4448,
+      "positive": 280,
+      "groups": 57
+    },
+    "validation": {
+      "rows": 1462,
+      "positive": 88,
+      "groups": 16
+    },
+    "test": {
+      "rows": 1480,
+      "positive": 88,
+      "groups": 22,
+      "untouched_until_after_selection": true
+    },
+    "group_overlap": {
+      "train_validation": 0,
+      "train_test": 0,
+      "validation_test": 0
+    }
+  },
+  "validation_metrics": {
+    "random_forest": {
+      "decision_threshold": 0.5,
+      "precision": 0.43137254901960786,
+      "recall": 0.25,
+      "f1": 0.31654676258992803,
+      "pr_auc_average_precision": 0.40168225965033083,
+      "roc_auc": 0.9309704578536456,
+      "accuracy_secondary": 0.9350205198358413,
+      "confusion_matrix": {
+        "labels": [
+          0,
+          1
+        ],
+        "matrix": [
+          [
+            1345,
+            29
+          ],
+          [
+            66,
+            22
+          ]
+        ],
+        "tn": 1345,
+        "fp": 29,
+        "fn": 66,
+        "tp": 22
+      }
+    },
+    "xgboost": {
+      "decision_threshold": 0.5,
+      "precision": 0.36470588235294116,
+      "recall": 0.7045454545454546,
+      "f1": 0.4806201550387597,
+      "pr_auc_average_precision": 0.39694984339069245,
+      "roc_auc": 0.932488090512108,
+      "accuracy_secondary": 0.908344733242134,
+      "confusion_matrix": {
+        "labels": [
+          0,
+          1
+        ],
+        "matrix": [
+          [
+            1266,
+            108
+          ],
+          [
+            26,
+            62
+          ]
+        ],
+        "tn": 1266,
+        "fp": 108,
+        "fn": 26,
+        "tp": 62
+      }
+    }
+  },
+  "selected_model": "random_forest",
+  "selection_rule": "highest validation PR-AUC, then recall, then F1",
+  "test_metrics": {
+    "decision_threshold": 0.5,
+    "precision": 0.42857142857142855,
+    "recall": 0.13636363636363635,
+    "f1": 0.20689655172413793,
+    "pr_auc_average_precision": 0.396776686908739,
+    "roc_auc": 0.9444553291536051,
+    "accuracy_secondary": 0.9378378378378378,
+    "confusion_matrix": {
+      "labels": [
+        0,
+        1
+      ],
+      "matrix": [
+        [
+          1376,
+          16
+        ],
+        [
+          76,
+          12
+        ]
+      ],
+      "tn": 1376,
+      "fp": 16,
+      "fn": 76,
+      "tp": 12
+    }
+  },
+  "test_metrics_semantics": "untouched spatial-group test metrics for the selected model",
+  "model_path": "ML\\models\\static_susceptibility_model.joblib"
+}

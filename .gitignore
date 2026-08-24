@@ -24,5 +24,8 @@ __pycache__/
 .env
 
 # VS Code local settings
-.vscode/FRONTEND/node_modules/
+.vscode/
+
+# Frontend dependency and build outputs
+FRONTEND/node_modules/
 FRONTEND/dist/

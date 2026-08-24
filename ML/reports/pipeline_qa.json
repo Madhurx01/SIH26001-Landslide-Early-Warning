@@ -1,0 +1,99 @@
+{
+  "passed": true,
+  "raw_immutability": {
+    "unchanged": true,
+    "files_before": 337,
+    "files_after": 337,
+    "changed_paths": [],
+    "verification": "path, size, mtime_ns, and SHA-256 compared before vs after"
+  },
+  "static": {
+    "rows": 7390,
+    "unique_cells": 7390,
+    "target_distribution": {
+      "0": 6934,
+      "1": 456
+    },
+    "input_missing": {
+      "elevation_mean_m": 9,
+      "elevation_min_m": 9,
+      "elevation_max_m": 9,
+      "elevation_std_m": 9,
+      "terrain_relief_m": 9,
+      "slope_mean_deg": 34,
+      "slope_max_deg": 34,
+      "slope_std_deg": 34,
+      "aspect_sin": 34,
+      "aspect_cos": 34,
+      "dominant_landcover_class": 5,
+      "lc_tree_fraction": 5,
+      "lc_shrub_fraction": 5,
+      "lc_grass_fraction": 5,
+      "lc_cropland_fraction": 5,
+      "lc_builtup_fraction": 5,
+      "lc_bare_fraction": 5,
+      "lc_snow_ice_fraction": 5,
+      "lc_water_fraction": 5,
+      "lc_wetland_fraction": 5,
+      "lc_moss_lichen_fraction": 5
+    },
+    "output_missing": {},
+    "susceptibility_range": [
+      0.0,
+      92.03036420970999
+    ]
+  },
+  "dynamic": {
+    "rows": 1197180,
+    "expected_rows": 1197180,
+    "unique_cells": 7390,
+    "unique_dates": 162,
+    "date_min": "2021-05-11T00:00:00",
+    "date_max": "2021-10-19T00:00:00",
+    "duplicate_cell_dates": 0,
+    "missing": {
+      "soil_moisture_am": 1196669,
+      "soil_moisture_pm": 1196503,
+      "soil_moisture": 1196098,
+      "soil_moisture_am_quality_flag": 748717,
+      "soil_moisture_pm_quality_flag": 315071
+    },
+    "smap_files_checked": 162,
+    "smap_geolocation_consistent_count": 40,
+    "smap_geolocation_remapped_count": 37,
+    "smap_geolocation_unavailable_count": 85,
+    "trigger_range": [
+      0.0,
+      100.0
+    ]
+  },
+  "risk": {
+    "rows": 1197180,
+    "duplicate_cell_dates": 0,
+    "missing": {},
+    "score_range": [
+      0.0,
+      94.02277315728249
+    ],
+    "level_counts": {
+      "LOW": 1112415,
+      "MODERATE": 61198,
+      "HIGH": 17729,
+      "SEVERE": 5838
+    }
+  },
+  "events": {
+    "valid_records": 13,
+    "unique_dates": 11,
+    "unique_cells": 9,
+    "missing": {
+      "soil_moisture_am": 13,
+      "soil_moisture_pm": 13,
+      "soil_moisture": 13,
+      "soil_moisture_am_quality_flag": 11,
+      "soil_moisture_pm_quality_flag": 3,
+      "same_date_background_median_soil_moisture": 12
+    },
+    "all_inside_window": true
+  }
+}

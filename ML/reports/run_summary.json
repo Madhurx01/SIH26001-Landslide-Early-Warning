@@ -1,0 +1,199 @@
+{
+  "completed_at_utc": "2026-08-24T18:14:41.673163+00:00",
+  "outputs": [
+    "DATA\\PROCESSED\\RISK\\static_susceptibility.csv",
+    "DATA\\PROCESSED\\DYNAMIC\\sikkim_dynamic_features_2021.csv",
+    "DATA\\PROCESSED\\RISK\\sikkim_landslide_risk_2021.csv",
+    "DATA\\PROCESSED\\RISK\\demo_risk.geojson",
+    "ML\\reports\\event_validation_2021.csv",
+    "ML\\reports\\event_validation_2021.json",
+    "ML\\models\\static_susceptibility_model.joblib",
+    "ML\\reports\\static_model_metrics.json",
+    "ML\\reports\\pipeline_qa.json",
+    "ML\\reports\\run_summary.json"
+  ],
+  "dimensions": {
+    "static_rows": 7390,
+    "dynamic_rows": 1197180,
+    "risk_rows": 1197180,
+    "grid_cells": 7390,
+    "dynamic_dates": 162
+  },
+  "selected_static_model": "random_forest",
+  "static_model_validation_metrics": {
+    "random_forest": {
+      "decision_threshold": 0.5,
+      "precision": 0.43137254901960786,
+      "recall": 0.25,
+      "f1": 0.31654676258992803,
+      "pr_auc_average_precision": 0.40168225965033083,
+      "roc_auc": 0.9309704578536456,
+      "accuracy_secondary": 0.9350205198358413,
+      "confusion_matrix": {
+        "labels": [
+          0,
+          1
+        ],
+        "matrix": [
+          [
+            1345,
+            29
+          ],
+          [
+            66,
+            22
+          ]
+        ],
+        "tn": 1345,
+        "fp": 29,
+        "fn": 66,
+        "tp": 22
+      }
+    },
+    "xgboost": {
+      "decision_threshold": 0.5,
+      "precision": 0.36470588235294116,
+      "recall": 0.7045454545454546,
+      "f1": 0.4806201550387597,
+      "pr_auc_average_precision": 0.39694984339069245,
+      "roc_auc": 0.932488090512108,
+      "accuracy_secondary": 0.908344733242134,
+      "confusion_matrix": {
+        "labels": [
+          0,
+          1
+        ],
+        "matrix": [
+          [
+            1266,
+            108
+          ],
+          [
+            26,
+            62
+          ]
+        ],
+        "tn": 1266,
+        "fp": 108,
+        "fn": 26,
+        "tp": 62
+      }
+    }
+  },
+  "static_model_test_metrics": {
+    "decision_threshold": 0.5,
+    "precision": 0.42857142857142855,
+    "recall": 0.13636363636363635,
+    "f1": 0.20689655172413793,
+    "pr_auc_average_precision": 0.396776686908739,
+    "roc_auc": 0.9444553291536051,
+    "accuracy_secondary": 0.9378378378378378,
+    "confusion_matrix": {
+      "labels": [
+        0,
+        1
+      ],
+      "matrix": [
+        [
+          1376,
+          16
+        ],
+        [
+          76,
+          12
+        ]
+      ],
+      "tn": 1376,
+      "fp": 16,
+      "fn": 76,
+      "tp": 12
+    }
+  },
+  "valid_2021_gsi_events": 13,
+  "unique_2021_gsi_event_dates": 11,
+  "dynamic_date_range": [
+    "2021-05-11T00:00:00",
+    "2021-10-19T00:00:00"
+  ],
+  "dynamic": {
+    "rows": 1197180,
+    "cells": 7390,
+    "dates": 162,
+    "date_min": "2021-05-11T00:00:00",
+    "date_max": "2021-10-19T00:00:00",
+    "imerg": {
+      "product": "NASA GPM IMERG daily precipitation",
+      "units": "mm/day",
+      "native_grid_shape_in_subset": [
+        12,
+        14
+      ],
+      "native_resolution": "0.1 degree (approximately 10 km; not 1 km)",
+      "unique_native_pixels_mapped_to_1km_cells": 86,
+      "maximum_nearest_mapping_distance_degrees": 0.07006909147993902
+    },
+    "smap": {
+      "product": "NASA SMAP L3 enhanced soil moisture",
+      "native_resolution": "approximately 9 km; not 1 km",
+      "am_native_grid_shape_in_subset": [
+        19,
+        14
+      ],
+      "pm_native_grid_shape_in_subset": [
+        19,
+        14
+      ],
+      "am_unique_native_pixels_mapped_to_1km_cells": 112,
+      "pm_unique_native_pixels_mapped_to_1km_cells": 112,
+      "pm_geolocation_fallback": "PM latitude/longitude arrays are fill-only; corresponding AM EASE2 grid coordinates used for the same array indices",
+      "quality_filter": "retrieval_qual_flag must be 0 or 8; soil moisture constrained to [0,1]",
+      "daily_representative": "mean of valid AM and PM; valid single orbit used when only one is available",
+      "smap_files_checked": 162,
+      "smap_geolocation_consistent_count": 40,
+      "smap_geolocation_remapped_count": 37,
+      "smap_geolocation_unavailable_count": 85,
+      "geolocation_verification": "shape and latitude/longitude coordinate order checked for every daily file; orbits with unavailable geolocation are left missing"
+    },
+    "rolling_rainfall": "calendar-day sums; the first 2/6 dates use available-period partial 3d/7d windows and days_available columns make this left-censoring explicit",
+    "trigger_formula": "0-100 weighted mean of P5-P95 clipped components: 35% rainfall_1d + 25% rainfall_3d + 20% rainfall_7d + 20% soil_moisture; weights are renormalized if a quality-filtered soil value is unavailable",
+    "scaling_cutpoints": {
+      "rainfall_1d": {
+        "lower_percentile": 5.0,
+        "lower_value": 0.0,
+        "upper_percentile": 95.0,
+        "upper_value": 37.8599967956543
+      },
+      "rainfall_3d": {
+        "lower_percentile": 5.0,
+        "lower_value": 0.9049999713897705,
+        "upper_percentile": 95.0,
+        "upper_value": 84.50000190734863
+      },
+      "rainfall_7d": {
+        "lower_percentile": 5.0,
+        "lower_value": 5.025000035762787,
+        "upper_percentile": 95.0,
+        "upper_value": 154.89498710632324
+      },
+      "soil_moisture": {
+        "lower_percentile": 5.0,
+        "lower_value": 0.1009589359164238,
+        "upper_percentile": 95.0,
+        "upper_value": 0.19640207290649414
+      }
+    },
+    "score_semantics": "engineering early-warning trigger score; not calibrated probability"
+  },
+  "risk_formula": "final_risk_score = 100 * (0.35*S + 0.25*D + 0.40*S*D), where S=static_susceptibility/100 and D=dynamic_trigger_score/100",
+  "risk_thresholds": {
+    "LOW": "[0, 30)",
+    "MODERATE": "[30, 50)",
+    "HIGH": "[50, 70)",
+    "SEVERE": "[70, 100]"
+  },
+  "threshold_semantics": "MVP operational categories, not scientifically calibrated thresholds",
+  "demo_date": "2021-10-19T00:00:00",
+  "qa_passed": true,
+  "raw_unchanged": true,
+  "rerun_command": ".\\venv\\Scripts\\python.exe ML\\run_landslide_mvp.py"
+}
