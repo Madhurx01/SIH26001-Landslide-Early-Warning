@@ -24,4 +24,5 @@ __pycache__/
 .env
 
 # VS Code local settings
-.vscode/
+.vscode/FRONTEND/node_modules/
+FRONTEND/dist/
