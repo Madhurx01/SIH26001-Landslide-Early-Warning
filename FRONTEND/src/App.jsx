@@ -28,14 +28,23 @@ export default function App() {
   const [acknowledged, setAcknowledged] = useState([])
 
   useEffect(() => {
-    api.getDashboard().then((dashboard) => {
-      setData(dashboard)
-      if (dashboard.milestones && dashboard.milestones.length > 0) {
-        setSelectedDate(dashboard.milestones[dashboard.milestones.length - 1].date)
-      }
-      setSelectedCell(dashboard.riskCells[0])
-    })
-  }, [])
+    const fetchData = () => {
+      api.getDashboard().then((dashboard) => {
+        setData(dashboard)
+        if (!selectedDate && dashboard.milestones && dashboard.milestones.length > 0) {
+          setSelectedDate(dashboard.milestones[dashboard.milestones.length - 1].date)
+        }
+        if (!selectedCell && dashboard.riskCells && dashboard.riskCells.length > 0) {
+          setSelectedCell(dashboard.riskCells[0])
+        }
+      })
+    }
+
+    fetchData()
+    // Auto-poll live cloud radar feeds every 60 seconds
+    const pollInterval = setInterval(fetchData, 60000)
+    return () => clearInterval(pollInterval)
+  }, [selectedDate, selectedCell])
 
   const closeReport = useCallback(() => setReportOpen(false), [])
 
