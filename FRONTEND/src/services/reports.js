@@ -1,7 +1,7 @@
-// Dedicated Live Shared Pool Storage Service
-// Direct connection to Dedicated Storage Server (https://d46babf2acd1b6.lhr.life)
+// Permanent Google Cloud Firebase Realtime Database Sync Service
+// 24/7/365 Real-Time Cross-Device Synchronization for Vercel, Mobile, and Desktop Command
 
-export const STORAGE_SERVER_URL = 'https://57de918ddfd350.lhr.life/api/reports'
+export const FIREBASE_DB_URL = 'https://sih-26001-default-rtdb.firebaseio.com/reports.json'
 
 export const DEFAULT_REPORTS = [
   {
@@ -43,21 +43,27 @@ export const reportService = {
   },
 
   getReports: async () => {
-    // 1. Primary: Dedicated Live Storage Server
+    // 1. Primary: Google Firebase Realtime Database (Instant Global Cloud Sync)
     try {
-      const res = await fetch(STORAGE_SERVER_URL, { cache: 'no-store' })
+      const res = await fetch(FIREBASE_DB_URL, { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         if (Array.isArray(data) && data.length > 0) {
           localStorage.setItem('sih_citizen_reports', JSON.stringify(data))
           return data
+        } else if (data && typeof data === 'object') {
+          const list = Object.values(data)
+          if (list.length > 0) {
+            localStorage.setItem('sih_citizen_reports', JSON.stringify(list))
+            return list
+          }
         }
       }
     } catch (e) {
-      console.warn('Dedicated storage server unavailable, checking local endpoint', e)
+      console.warn('Firebase RTDB fetch failed, checking local store', e)
     }
 
-    // 2. Secondary: Local /api/reports endpoint
+    // 2. Secondary: Local /api/reports fallback
     try {
       const res2 = await fetch('/api/reports', { cache: 'no-store' })
       if (res2.ok) {
@@ -70,39 +76,7 @@ export const reportService = {
   },
 
   addReport: async (newReport) => {
-    // 1. Primary: POST to Dedicated Live Storage Server
-    try {
-      const res = await fetch(STORAGE_SERVER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReport)
-      })
-      if (res.ok) {
-        const data = await res.json()
-        if (data.report) {
-          if (data.all) localStorage.setItem('sih_citizen_reports', JSON.stringify(data.all))
-          return data.report
-        }
-      }
-    } catch (e) {
-      console.warn('Dedicated storage POST failed, attempting local fallback', e)
-    }
-
-    // 2. Secondary fallback
-    try {
-      const res2 = await fetch('/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReport)
-      })
-      if (res2.ok) {
-        const data2 = await res2.json()
-        if (data2.report) return data2.report
-      }
-    } catch (err) {}
-
-    // 3. Local storage fallback
-    const current = reportService.getInitialReports()
+    const current = await reportService.getReports()
     const reportId = `CR-${100 + current.length + 1}`
     const fullReport = {
       id: reportId,
@@ -112,31 +86,37 @@ export const reportService = {
       ...newReport
     }
     const updated = [fullReport, ...current]
+
+    // 1. Direct Cloud PUT to Firebase Realtime Database
+    try {
+      await fetch(FIREBASE_DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      })
+    } catch (e) {
+      console.warn('Firebase PUT failed, saving locally', e)
+    }
+
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return fullReport
   },
 
   updateStatus: async (id, status) => {
-    // 1. Primary: PATCH to Dedicated Live Storage Server
+    const current = await reportService.getReports()
+    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
+
+    // 1. Update Cloud Firebase Realtime Database
     try {
-      const res = await fetch(STORAGE_SERVER_URL, {
-        method: 'PATCH',
+      await fetch(FIREBASE_DB_URL, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status })
+        body: JSON.stringify(updated)
       })
-      if (res.ok) {
-        const data = await res.json()
-        if (data.reports) {
-          localStorage.setItem('sih_citizen_reports', JSON.stringify(data.reports))
-          return data.reports
-        }
-      }
     } catch (e) {
-      console.warn('Dedicated storage PATCH failed', e)
+      console.warn('Firebase status update failed', e)
     }
 
-    const current = reportService.getInitialReports()
-    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return updated
   }
