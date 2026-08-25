@@ -63,7 +63,7 @@ export const authService = {
     } catch (e) {
       console.warn('Could not read auth from localStorage', e)
     }
-    return PRESET_USERS.admin // Default to Admin for full hackathon experience
+    return PRESET_USERS.viewer // Default to Citizen (Public Viewer) for all new visitors and unauthenticated sessions
   },
 
   login: (roleKey = 'admin') => {

@@ -23,7 +23,7 @@ const labels = {
 }
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUser() || PRESET_USERS.admin)
+  const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUser() || PRESET_USERS.viewer)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [citizenReports, setCitizenReports] = useState(() => reportService.getInitialReports())
   const [data, setData] = useState(null)
