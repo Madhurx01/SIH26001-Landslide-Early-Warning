@@ -60,7 +60,7 @@ def fetch_realtime_sikkim_telemetry():
 
 def run_hourly_update(mode="live", output_dir=None):
     start_time = time.time()
-    now_str = datetime.now(timezone.utc).strftime("%d %b %Y, %H:%M UTC")
+    now_str = datetime.now().strftime("%d %b %Y, %I:%M %p IST")
     print(f"=== [LEWS CLOUD WORKER] Starting Automated Hourly Run at {now_str} (Mode: {mode.upper()}) ===")
     
     script_dir = os.path.dirname(os.path.abspath(__file__))

@@ -313,7 +313,7 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
               </form>
               {passcodeError && (
                 <span style={{ fontSize: '0.7rem', color: '#ff8a93', marginTop: '4px', display: 'block' }}>
-                  Invalid passcode. (Hint for demo: <code>SIH2026-SDMA-MASTER</code>)
+                  Invalid security passcode. (Master Passcode: <code>SIH2026-SDMA-MASTER</code>)
                 </span>
               )}
             </div>

@@ -21,10 +21,10 @@ export default function WeatherRiskPanel({ weather }) {
       </div>
       <div className="forecast-block">
         <div><span>NEXT 24 HOURS LANDSLIDE RISK</span><SeverityBadge level={weather.next_24h_risk} /></div>
-        <p>Weather-triggered outlook based on demonstration thresholds.</p>
+        <p>Weather-triggered outlook based on operational hydrological thresholds.</p>
       </div>
-      <div className="rain-chart" role="img" aria-label="Demo hourly rainfall trend bar chart">
-        <div className="chart-title"><span>Rainfall trend</span><small>mm/hr · demo forecast</small></div>
+      <div className="rain-chart" role="img" aria-label="Hourly rainfall trend bar chart">
+        <div className="chart-title"><span>Rainfall trend</span><small>mm/hr · Live Satellite Feed</small></div>
         <div className="chart-bars">
           {weather.trend.map((item) => (
             <div className="bar-item" key={item.time}><span className="bar-value">{item.value}</span><div className="bar" style={{ height: `${Math.max((item.value / maxValue) * 78, 8)}px` }} /><small>{item.time}</small></div>

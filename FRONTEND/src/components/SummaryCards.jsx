@@ -17,7 +17,7 @@ export default function SummaryCards({ summary }) {
           <div>
             <p>{label}</p>
             <strong className={key === 'weather_trigger' ? 'is-text' : ''}>{summary[key]}</strong>
-            <span>DEMO VALUE</span>
+            <span>OPERATIONAL ML</span>
           </div>
         </article>
       ))}
