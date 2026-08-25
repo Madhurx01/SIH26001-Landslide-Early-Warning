@@ -45,10 +45,26 @@ export default function App() {
       })
     }
 
+    const fetchPooledReports = () => {
+      reportService.getReports().then((reps) => {
+        if (reps && reps.length > 0) {
+          setCitizenReports(reps)
+        }
+      })
+    }
+
     fetchData()
+    fetchPooledReports()
+
     // Auto-poll live cloud radar feeds every 60 seconds
     const pollInterval = setInterval(fetchData, 60000)
-    return () => clearInterval(pollInterval)
+    // Auto-poll shared pooled citizen reports every 3 seconds for real-time mobile sync
+    const reportPollInterval = setInterval(fetchPooledReports, 3000)
+
+    return () => {
+      clearInterval(pollInterval)
+      clearInterval(reportPollInterval)
+    }
   }, [selectedCell])
 
   const closeReport = useCallback(() => setReportOpen(false), [])

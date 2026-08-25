@@ -1,5 +1,5 @@
-// Centralized Persistent Report Store for Crowd-Sourced Citizen Observations
-// Persists to localStorage with photo previews, GPS coordinates, and status tracking
+// Shared Pooled Cloud Storage Service for Citizen Reports
+// Real-time synchronization across Mobile devices and Desktop Admin consoles
 
 const DEFAULT_REPORTS = [
   {
@@ -8,7 +8,7 @@ const DEFAULT_REPORTS = [
     timestamp: '18 mins ago',
     reportedBy: 'Tenzing L. (Local Driver)',
     description: 'Active debris fall and rock tumbling observed across southbound lane. Soil slumping from upper toe cutting.',
-    roadBlocked: 'Partial (Single Lane Blocked)',
+    roadBlocked: 'Partial (Single Lane)',
     status: 'PENDING_VERIFICATION',
     severity: 'HIGH',
     coords: '27.2341°N, 88.4982°E',
@@ -20,7 +20,7 @@ const DEFAULT_REPORTS = [
     timestamp: '42 mins ago',
     reportedBy: 'Pema D. (BRO Road Worker)',
     description: 'Mudflow slurry pooling along culvert. Tension cracks expanding across roadside retaining wall.',
-    roadBlocked: 'No (High Risk of Sudden Blockage)',
+    roadBlocked: 'No Blockage',
     status: 'PENDING_VERIFICATION',
     severity: 'SEVERE',
     coords: '27.6042°N, 88.6431°E',
@@ -29,43 +29,74 @@ const DEFAULT_REPORTS = [
 ]
 
 export const reportService = {
-  getReports: () => {
+  getReports: async () => {
+    try {
+      const res = await fetch('/api/reports')
+      if (res.ok) {
+        const data = await res.json()
+        localStorage.setItem('sih_citizen_reports', JSON.stringify(data))
+        return data
+      }
+    } catch (e) {
+      console.warn('API fetch failed, falling back to local store', e)
+    }
+
     try {
       const stored = localStorage.getItem('sih_citizen_reports')
       if (stored) return JSON.parse(stored)
-    } catch (e) {
-      console.warn('Could not read reports from localStorage', e)
-    }
+    } catch (e) {}
+
     return DEFAULT_REPORTS
   },
 
-  addReport: (newReport) => {
-    const current = reportService.getReports()
+  addReport: async (newReport) => {
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newReport)
+      })
+      if (res.ok) {
+        const data = await res.json()
+        return data.report
+      }
+    } catch (e) {
+      console.warn('Pooled API POST failed, saving to local store', e)
+    }
+
+    // Local fallback
+    const current = JSON.parse(localStorage.getItem('sih_citizen_reports') || '[]')
     const reportId = `CR-${100 + current.length + 1}`
     const fullReport = {
       id: reportId,
       timestamp: 'Just now',
       status: 'PENDING_VERIFICATION',
-      severity: newReport.roadBlocked === 'yes' ? 'SEVERE' : 'HIGH',
+      severity: newReport.roadBlocked?.includes('Full') ? 'SEVERE' : 'HIGH',
       ...newReport
     }
     const updated = [fullReport, ...current]
-    try {
-      localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
-    } catch (e) {
-      console.warn('Could not save report to localStorage', e)
-    }
+    localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return fullReport
   },
 
-  updateStatus: (id, status) => {
-    const current = reportService.getReports()
-    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
+  updateStatus: async (id, status) => {
     try {
-      localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
+      const res = await fetch('/api/reports', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        return data.reports
+      }
     } catch (e) {
-      console.warn('Could not update report status', e)
+      console.warn('Pooled API PATCH failed, updating local store', e)
     }
+
+    const current = JSON.parse(localStorage.getItem('sih_citizen_reports') || '[]')
+    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
+    localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return updated
   }
 }
