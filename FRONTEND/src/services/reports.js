@@ -1,7 +1,7 @@
 // Dedicated Live Shared Pool Storage Service
 // Direct connection to Dedicated Storage Server (https://d46babf2acd1b6.lhr.life)
 
-export const STORAGE_SERVER_URL = 'https://d46babf2acd1b6.lhr.life/api/reports'
+export const STORAGE_SERVER_URL = 'https://57de918ddfd350.lhr.life/api/reports'
 
 export const DEFAULT_REPORTS = [
   {
