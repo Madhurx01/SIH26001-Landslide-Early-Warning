@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Camera, ChevronRight, Gauge, RadioTower } from 'lucide-react'
+import { Camera, ChevronRight, Gauge, RadioTower, ShieldAlert, KeyRound } from 'lucide-react'
 import Header from './components/Header'
 import TimelineController from './components/TimelineController'
 import SummaryCards from './components/SummaryCards'
@@ -11,7 +11,10 @@ import HighwayInspectorModal from './components/HighwayInspectorModal'
 import EmergencyPriorityPanel from './components/EmergencyPriorityPanel'
 import AlertsPanel from './components/AlertsPanel'
 import CitizenReportModal from './components/CitizenReportModal'
+import AuthModal from './components/AuthModal'
+import ReportVerificationPanel from './components/ReportVerificationPanel'
 import api from './services/api'
+import authService, { PRESET_USERS } from './services/auth'
 
 const labels = {
   en: { title: 'AI-Based Landslide Early Warning & Risk Monitoring', pilot: 'Pilot', systemStatus: 'System Status', language: 'Language', dashboard: 'Dashboard', riskMap: 'Risk Map', citizenReport: 'Citizen Report' },
@@ -19,6 +22,8 @@ const labels = {
 }
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser())
+  const [authModalOpen, setAuthModalOpen] = useState(false)
   const [data, setData] = useState(null)
   const [selectedCell, setSelectedCell] = useState(null)
   const [telemetryMode, setTelemetryMode] = useState('live') // 'live' or 'storm'
@@ -100,7 +105,14 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header meta={data.meta} language={language} onLanguageChange={setLanguage} labels={labels[language]} />
+      <Header
+        meta={data.meta}
+        language={language}
+        onLanguageChange={setLanguage}
+        labels={labels[language]}
+        currentUser={currentUser}
+        onOpenAuth={() => setAuthModalOpen(true)}
+      />
       <main className="main-content" id="dashboard">
         {/* Interactive Mode Toggle Bar */}
         <div style={{
@@ -221,8 +233,36 @@ export default function App() {
           onInspectRoad={(road) => setInspectedRoad(road)}
         />
 
+        {/* RBAC Admin Incident Verification Queue */}
+        {currentUser?.role === 'admin' && (
+          <div id="verification-queue" style={{ marginBottom: '1.5rem' }}>
+            <ReportVerificationPanel />
+          </div>
+        )}
+
         <div className="operations-grid">
-          <EmergencyPriorityPanel priorities={data.emergencyPriorities} />
+          {currentUser?.role !== 'viewer' ? (
+            <EmergencyPriorityPanel priorities={data.emergencyPriorities} />
+          ) : (
+            <section className="panel" style={{ borderLeft: '4px solid #27865f' }}>
+              <div className="panel-header">
+                <h2>Citizen Safety &amp; Evacuation Advisory</h2>
+                <span className="badge" style={{ background: '#27865f', color: '#fff' }}>Public Portal</span>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#cad5e2', lineHeight: 1.5 }}>
+                Stay alert along river valleys (Teesta Basin) and steep road cuttings. If traveling on NH-10 or towards North Sikkim (Lachen/Lachung), verify live road clearance status above before departure.
+              </p>
+              <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.06)', padding: '4px 10px', borderRadius: '6px' }}>
+                  📞 State Emergency Helpline: <strong>1070</strong> / <strong>112</strong>
+                </span>
+                <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.06)', padding: '4px 10px', borderRadius: '6px' }}>
+                  🚧 BRO Control Room: <strong>03592-202288</strong>
+                </span>
+              </div>
+            </section>
+          )}
+
           <div className="support-column">
             <section className="panel citizen-card" id="citizen-report">
               <div className="citizen-icon"><Camera size={24} /></div>
@@ -247,9 +287,11 @@ export default function App() {
       </main>
 
       <footer>
-        <strong>SIH26001 · Sikkim Pilot</strong>
+        <strong>SIH26001 · AAPTIRAKSHAK · Sikkim Pilot</strong>
         <p>Decision-support early warning system powered by Dual-Layer Machine Learning (Static Susceptibility &amp; Dynamic Meteorological Radar).</p>
-        <span style={{ background: '#138b9c', color: '#fff' }}>LIVE ML SYSTEM ACTIVE</span>
+        <span style={{ background: '#138b9c', color: '#fff' }}>
+          SESSION: {currentUser?.role?.toUpperCase()} ({currentUser?.name})
+        </span>
       </footer>
 
       <CitizenReportModal open={reportOpen} onClose={closeReport} />
@@ -262,6 +304,14 @@ export default function App() {
           onFocusMap={focusRoadOnMap}
         />
       )}
+
+      {/* RBAC & JWT Authentication Modal */}
+      <AuthModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        currentUser={currentUser}
+        onLogin={(roleKey) => setCurrentUser(authService.login(roleKey))}
+      />
     </div>
   )
 }
