@@ -4,7 +4,8 @@ import { PRESET_USERS } from '../services/auth'
 import ipGuard, { MASTER_ADMIN_IP, MASTER_OVERRIDE_PASSCODE } from '../services/ipGuard'
 
 export default function AuthModal({ open, onClose, currentUser, onLogin }) {
-  const [selectedRole, setSelectedRole] = useState(currentUser.role || 'admin')
+  const activeUser = currentUser || PRESET_USERS.admin
+  const [selectedRole, setSelectedRole] = useState(activeUser.role || 'admin')
   const [clientIp, setClientIp] = useState('Detecting...')
   const [isAuthorized, setIsAuthorized] = useState(true)
   const [passcode, setPasscode] = useState('')
@@ -329,11 +330,11 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
                 gap: '12px',
                 padding: '1rem',
                 borderRadius: '10px',
-                background: currentUser.role === 'admin' ? 'rgba(199, 53, 63, 0.2)' : 'rgba(255,255,255,0.03)',
-                border: `1.5px solid ${currentUser.role === 'admin' ? '#c7353f' : 'rgba(255,255,255,0.1)'}`,
+                background: activeUser.role === 'admin' ? 'rgba(199, 53, 63, 0.2)' : 'rgba(255,255,255,0.03)',
+                border: `1.5px solid ${activeUser.role === 'admin' ? '#c7353f' : 'rgba(255,255,255,0.1)'}`,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                opacity: (!isAuthorized && currentUser.role !== 'admin') ? 0.7 : 1
+                opacity: (!isAuthorized && activeUser.role !== 'admin') ? 0.7 : 1
               }}
             >
               <div style={{
@@ -348,7 +349,7 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <strong style={{ color: '#ff8a93', fontSize: '0.92rem' }}>State Disaster Commander (Admin)</strong>
-                  {currentUser.role === 'admin' && (
+                  {activeUser.role === 'admin' && (
                     <span style={{ fontSize: '0.7rem', background: '#c7353f', padding: '2px 8px', borderRadius: '12px' }}>
                       Active
                     </span>
@@ -370,8 +371,8 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
                 gap: '12px',
                 padding: '1rem',
                 borderRadius: '10px',
-                background: currentUser.role === 'analyst' ? 'rgba(19, 139, 156, 0.2)' : 'rgba(255,255,255,0.03)',
-                border: `1.5px solid ${currentUser.role === 'analyst' ? '#138b9c' : 'rgba(255,255,255,0.1)'}`,
+                background: activeUser.role === 'analyst' ? 'rgba(19, 139, 156, 0.2)' : 'rgba(255,255,255,0.03)',
+                border: `1.5px solid ${activeUser.role === 'analyst' ? '#138b9c' : 'rgba(255,255,255,0.1)'}`,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}
@@ -388,7 +389,7 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <strong style={{ color: '#4dd4e8', fontSize: '0.92rem' }}>GIS &amp; Landslide Scientist (Analyst)</strong>
-                  {currentUser.role === 'analyst' && (
+                  {activeUser.role === 'analyst' && (
                     <span style={{ fontSize: '0.7rem', background: '#138b9c', padding: '2px 8px', borderRadius: '12px' }}>
                       Active
                     </span>
@@ -410,8 +411,8 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
                 gap: '12px',
                 padding: '1rem',
                 borderRadius: '10px',
-                background: currentUser.role === 'viewer' ? 'rgba(39, 134, 95, 0.2)' : 'rgba(255,255,255,0.03)',
-                border: `1.5px solid ${currentUser.role === 'viewer' ? '#27865f' : 'rgba(255,255,255,0.1)'}`,
+                background: activeUser.role === 'viewer' ? 'rgba(39, 134, 95, 0.2)' : 'rgba(255,255,255,0.03)',
+                border: `1.5px solid ${activeUser.role === 'viewer' ? '#27865f' : 'rgba(255,255,255,0.1)'}`,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}
@@ -428,7 +429,7 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <strong style={{ color: '#74e0b1', fontSize: '0.92rem' }}>Citizen / Traveler (Public Viewer)</strong>
-                  {currentUser.role === 'viewer' && (
+                  {activeUser.role === 'viewer' && (
                     <span style={{ fontSize: '0.7rem', background: '#27865f', padding: '2px 8px', borderRadius: '12px' }}>
                       Active
                     </span>
@@ -456,7 +457,7 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
           }}>
             <strong style={{ color: '#26d0ce' }}>🔑 Simulated JWT Bearer Token:</strong>
             <br />
-            {currentUser.token}
+            {activeUser.token}
           </div>
         </div>
       </div>

@@ -23,9 +23,9 @@ const labels = {
 }
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser())
+  const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUser() || PRESET_USERS.admin)
   const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [citizenReports, setCitizenReports] = useState(reportService.getReports())
+  const [citizenReports, setCitizenReports] = useState(() => reportService.getInitialReports())
   const [data, setData] = useState(null)
   const [selectedCell, setSelectedCell] = useState(null)
   const [telemetryMode, setTelemetryMode] = useState('live') // 'live' or 'storm'

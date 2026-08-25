@@ -1,7 +1,7 @@
 // Shared Pooled Cloud Storage Service for Citizen Reports
 // Real-time synchronization across Mobile devices and Desktop Admin consoles
 
-const DEFAULT_REPORTS = [
+export const DEFAULT_REPORTS = [
   {
     id: 'CR-104',
     location: 'NH-10 (Km 18.2, 20th Mile bend near Singtam)',
@@ -29,24 +29,32 @@ const DEFAULT_REPORTS = [
 ]
 
 export const reportService = {
+  getInitialReports: () => {
+    try {
+      const stored = localStorage.getItem('sih_citizen_reports')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed)) return parsed
+      }
+    } catch (e) {}
+    return DEFAULT_REPORTS
+  },
+
   getReports: async () => {
     try {
       const res = await fetch('/api/reports')
       if (res.ok) {
         const data = await res.json()
-        localStorage.setItem('sih_citizen_reports', JSON.stringify(data))
-        return data
+        if (Array.isArray(data)) {
+          localStorage.setItem('sih_citizen_reports', JSON.stringify(data))
+          return data
+        }
       }
     } catch (e) {
       console.warn('API fetch failed, falling back to local store', e)
     }
 
-    try {
-      const stored = localStorage.getItem('sih_citizen_reports')
-      if (stored) return JSON.parse(stored)
-    } catch (e) {}
-
-    return DEFAULT_REPORTS
+    return reportService.getInitialReports()
   },
 
   addReport: async (newReport) => {
@@ -65,7 +73,7 @@ export const reportService = {
     }
 
     // Local fallback
-    const current = JSON.parse(localStorage.getItem('sih_citizen_reports') || '[]')
+    const current = reportService.getInitialReports()
     const reportId = `CR-${100 + current.length + 1}`
     const fullReport = {
       id: reportId,
@@ -94,7 +102,7 @@ export const reportService = {
       console.warn('Pooled API PATCH failed, updating local store', e)
     }
 
-    const current = JSON.parse(localStorage.getItem('sih_citizen_reports') || '[]')
+    const current = reportService.getInitialReports()
     const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return updated

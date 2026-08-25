@@ -1,18 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ShieldCheck, CheckCircle2, XCircle, MapPin, AlertTriangle, Eye, Clock, Image as ImageIcon, Camera } from 'lucide-react'
-import reportService from '../services/reports'
+import reportService, { DEFAULT_REPORTS } from '../services/reports'
 
 export default function ReportVerificationPanel({ reports, onStatusChange }) {
-  const [reportList, setReportList] = useState(reports || reportService.getReports())
+  const [reportList, setReportList] = useState(() => (Array.isArray(reports) ? reports : reportService.getInitialReports()))
   const [selectedPhoto, setSelectedPhoto] = useState(null)
 
-  const handleAction = (id, newStatus) => {
-    const updated = reportService.updateStatus(id, newStatus)
-    setReportList(updated)
-    if (onStatusChange) onStatusChange(updated)
+  useEffect(() => {
+    if (Array.isArray(reports)) {
+      setReportList(reports)
+    }
+  }, [reports])
+
+  const handleAction = async (id, newStatus) => {
+    const updated = await reportService.updateStatus(id, newStatus)
+    if (Array.isArray(updated)) {
+      setReportList(updated)
+      if (onStatusChange) onStatusChange(updated)
+    }
   }
 
-  const pendingCount = reportList.filter((r) => r.status === 'PENDING_VERIFICATION').length
+  const safeList = Array.isArray(reportList) ? reportList : DEFAULT_REPORTS
+  const pendingCount = safeList.filter((r) => r && r.status === 'PENDING_VERIFICATION').length
 
   return (
     <section className="panel" style={{ borderLeft: '4px solid #c7353f' }}>
@@ -31,7 +40,8 @@ export default function ReportVerificationPanel({ reports, onStatusChange }) {
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-        {reportList.map((report) => {
+        {safeList.map((report) => {
+          if (!report) return null
           const isPending = report.status === 'PENDING_VERIFICATION'
           const isVerified = report.status === 'VERIFIED'
           const isDismissed = report.status === 'DISMISSED'
