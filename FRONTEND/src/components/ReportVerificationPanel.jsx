@@ -1,38 +1,15 @@
 import React, { useState } from 'react'
-import { ShieldCheck, CheckCircle2, XCircle, MapPin, AlertTriangle, Eye, Clock } from 'lucide-react'
+import { ShieldCheck, CheckCircle2, XCircle, MapPin, AlertTriangle, Eye, Clock, Image as ImageIcon, Camera } from 'lucide-react'
+import reportService from '../services/reports'
 
-export const INITIAL_CITIZEN_REPORTS = [
-  {
-    id: 'CR-104',
-    location: 'NH-10 (Km 18.2, 20th Mile bend near Singtam)',
-    timestamp: '18 mins ago',
-    reportedBy: 'Tenzing L. (Local Driver)',
-    description: 'Active debris fall and rock tumbling observed across southbound lane. Soil slumping from upper toe cutting.',
-    roadBlocked: 'Partial (Single Lane Blocked)',
-    status: 'PENDING_VERIFICATION',
-    severity: 'HIGH',
-    coords: '27.234°N, 88.498°E'
-  },
-  {
-    id: 'CR-105',
-    location: 'North Sikkim Highway (Chungthang Gorge Km 42)',
-    timestamp: '42 mins ago',
-    reportedBy: 'Pema D. (BRO Road Worker)',
-    description: 'Mudflow slurry pooling along culvert. Tension cracks expanding across roadside retaining wall.',
-    roadBlocked: 'No (High Risk of Sudden Blockage)',
-    status: 'PENDING_VERIFICATION',
-    severity: 'SEVERE',
-    coords: '27.604°N, 88.643°E'
-  }
-]
-
-export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPORTS, onVerify, onDismiss }) {
-  const [reportList, setReportList] = useState(reports)
+export default function ReportVerificationPanel({ reports, onStatusChange }) {
+  const [reportList, setReportList] = useState(reports || reportService.getReports())
+  const [selectedPhoto, setSelectedPhoto] = useState(null)
 
   const handleAction = (id, newStatus) => {
-    setReportList((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
-    )
+    const updated = reportService.updateStatus(id, newStatus)
+    setReportList(updated)
+    if (onStatusChange) onStatusChange(updated)
   }
 
   const pendingCount = reportList.filter((r) => r.status === 'PENDING_VERIFICATION').length
@@ -41,7 +18,7 @@ export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPO
     <section className="panel" style={{ borderLeft: '4px solid #c7353f' }}>
       <div className="panel-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ShieldCheck size={18} style={{ color: '#c7353f' }} />
+          <ShieldCheck size={20} style={{ color: '#c7353f' }} />
           <h2>Citizen Incident Verification Queue (Admin Authority)</h2>
         </div>
         <span className="badge" style={{ background: '#c7353f', color: '#fff' }}>
@@ -50,10 +27,10 @@ export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPO
       </div>
 
       <p style={{ fontSize: '0.8rem', color: '#cad5e2', margin: '0.35rem 0 1rem 0' }}>
-        Review crowd-sourced ground observations submitted by local citizens and field workers. Verified reports update the live risk map and notify Border Roads Organisation (BRO).
+        Review crowd-sourced ground observations submitted via mobile devices &amp; citizen reporting. Verified reports update the operational risk map and dispatch real-time alerts to Border Roads Organisation (BRO) and SDRF.
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
         {reportList.map((report) => {
           const isPending = report.status === 'PENDING_VERIFICATION'
           const isVerified = report.status === 'VERIFIED'
@@ -63,20 +40,22 @@ export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPO
             <div
               key={report.id}
               style={{
-                background: isVerified ? 'rgba(39, 134, 95, 0.1)' : isDismissed ? 'rgba(255,255,255,0.02)' : 'rgba(199, 53, 63, 0.08)',
-                border: `1px solid ${isVerified ? '#27865f' : isDismissed ? 'rgba(255,255,255,0.1)' : 'rgba(199, 53, 63, 0.3)'}`,
+                background: isVerified ? 'rgba(39, 134, 95, 0.12)' : isDismissed ? 'rgba(255,255,255,0.02)' : 'rgba(199, 53, 63, 0.08)',
+                border: `1.5px solid ${isVerified ? '#27865f' : isDismissed ? 'rgba(255,255,255,0.1)' : 'rgba(199, 53, 63, 0.3)'}`,
                 borderRadius: '8px',
-                padding: '0.85rem 1rem'
+                padding: '0.9rem 1.1rem'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <strong style={{ fontSize: '0.88rem', color: '#fff' }}>{report.id} · {report.location}</strong>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <strong style={{ fontSize: '0.92rem', color: '#fff' }}>
+                      {report.id} · {report.location}
+                    </strong>
                     <span style={{
                       fontSize: '0.68rem',
                       fontWeight: 700,
-                      padding: '2px 6px',
+                      padding: '2px 7px',
                       borderRadius: '4px',
                       background: report.severity === 'SEVERE' ? '#c7353f' : '#e16713',
                       color: '#fff'
@@ -84,40 +63,60 @@ export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPO
                       {report.severity}
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span><Clock size={12} style={{ verticalAlign: 'middle', marginRight: '3px' }} />{report.timestamp}</span>
-                    <span>• Reported by: {report.reportedBy}</span>
-                    <span>• GPS: {report.coords}</span>
+                    <span>• Reporter: <strong>{report.reportedBy}</strong></span>
+                    <span>• GPS: <code>{report.coords}</code></span>
                   </div>
                 </div>
 
-                {/* Status Indicator */}
+                {/* Status Indicator Badge */}
                 <div>
                   {isVerified && (
-                    <span style={{ fontSize: '0.72rem', color: '#27865f', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <CheckCircle2 size={14} /> Verified by SDMA
+                    <span style={{ fontSize: '0.75rem', color: '#74e0b1', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(39, 134, 95, 0.25)', padding: '3px 8px', borderRadius: '4px' }}>
+                      <CheckCircle2 size={15} /> Verified by SDMA (Alert Broadcasted)
                     </span>
                   )}
                   {isDismissed && (
-                    <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <XCircle size={14} /> Dismissed (False Alarm)
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: '4px' }}>
+                      <XCircle size={15} /> Dismissed (False Alarm)
                     </span>
                   )}
                 </div>
               </div>
 
-              <p style={{ fontSize: '0.8rem', color: '#e2e8f0', margin: '0.5rem 0', fontStyle: 'italic' }}>
-                "{report.description}"
-              </p>
+              {/* Description & Photo Thumbnail Layout */}
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '0.6rem' }}>
+                {report.photoUrl && (
+                  <img
+                    src={report.photoUrl}
+                    alt="Citizen Evidence"
+                    onClick={() => setSelectedPhoto(report.photoUrl)}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      objectFit: 'cover',
+                      borderRadius: '6px',
+                      border: '1.5px solid #26d0ce',
+                      cursor: 'pointer',
+                      flexShrink: 0
+                    }}
+                    title="Click to expand camera photo"
+                  />
+                )}
+                <p style={{ fontSize: '0.82rem', color: '#e2e8f0', margin: 0, fontStyle: 'italic', flex: 1, lineHeight: 1.4 }}>
+                  "{report.description}"
+                </p>
+              </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                 <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600 }}>
                   <AlertTriangle size={13} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                  Road Obstruction: {report.roadBlocked}
+                  Traffic Impact: <strong>{report.roadBlocked}</strong>
                 </span>
 
                 {isPending && (
-                  <div style={{ display: 'flex', gap: '6px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                       type="button"
                       onClick={() => handleAction(report.id, 'DISMISSED')}
@@ -125,8 +124,8 @@ export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPO
                         background: 'transparent',
                         border: '1px solid rgba(255,255,255,0.2)',
                         color: '#cad5e2',
-                        fontSize: '0.72rem',
-                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        padding: '5px 12px',
                         borderRadius: '4px',
                         cursor: 'pointer'
                       }}
@@ -140,17 +139,17 @@ export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPO
                         background: '#27865f',
                         border: 'none',
                         color: '#fff',
-                        fontSize: '0.72rem',
+                        fontSize: '0.75rem',
                         fontWeight: 700,
-                        padding: '4px 12px',
+                        padding: '5px 14px',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '5px'
                       }}
                     >
-                      <CheckCircle2 size={13} /> Verify &amp; Alert BRO
+                      <CheckCircle2 size={14} /> Verify &amp; Alert BRO
                     </button>
                   </div>
                 )}
@@ -159,6 +158,32 @@ export default function ReportVerificationPanel({ reports = INITIAL_CITIZEN_REPO
           )
         })}
       </div>
+
+      {/* Expanded Photo Lightbox */}
+      {selectedPhoto && (
+        <div
+          onClick={() => setSelectedPhoto(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            cursor: 'zoom-out'
+          }}
+        >
+          <img
+            src={selectedPhoto}
+            alt="Expanded Evidence"
+            style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: '8px', border: '2px solid #26d0ce' }}
+          />
+        </div>
+      )}
     </section>
   )
 }

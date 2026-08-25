@@ -15,6 +15,7 @@ import AuthModal from './components/AuthModal'
 import ReportVerificationPanel from './components/ReportVerificationPanel'
 import api from './services/api'
 import authService, { PRESET_USERS } from './services/auth'
+import reportService from './services/reports'
 
 const labels = {
   en: { title: 'AI-Based Landslide Early Warning & Risk Monitoring', pilot: 'Pilot', systemStatus: 'System Status', language: 'Language', dashboard: 'Dashboard', riskMap: 'Risk Map', citizenReport: 'Citizen Report' },
@@ -24,6 +25,7 @@ const labels = {
 export default function App() {
   const [currentUser, setCurrentUser] = useState(authService.getCurrentUser())
   const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [citizenReports, setCitizenReports] = useState(reportService.getReports())
   const [data, setData] = useState(null)
   const [selectedCell, setSelectedCell] = useState(null)
   const [telemetryMode, setTelemetryMode] = useState('live') // 'live' or 'storm'
@@ -236,7 +238,10 @@ export default function App() {
         {/* RBAC Admin Incident Verification Queue */}
         {currentUser?.role === 'admin' && (
           <div id="verification-queue" style={{ marginBottom: '1.5rem' }}>
-            <ReportVerificationPanel />
+            <ReportVerificationPanel
+              reports={citizenReports}
+              onStatusChange={(updated) => setCitizenReports(updated)}
+            />
           </div>
         )}
 
@@ -294,7 +299,11 @@ export default function App() {
         </span>
       </footer>
 
-      <CitizenReportModal open={reportOpen} onClose={closeReport} />
+      <CitizenReportModal
+        open={reportOpen}
+        onClose={closeReport}
+        onReportSubmitted={(newR) => setCitizenReports(reportService.getReports())}
+      />
       
       {/* Highway Lifeline Inspector Modal */}
       {inspectedRoad && (
