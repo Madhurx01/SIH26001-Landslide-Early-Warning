@@ -1,7 +1,5 @@
-// Global Cloud-Synchronized Storage Service for Citizen Incident Reports
-// Real-time synchronization across Vercel deployments, mobile devices, and admin laptops
-
-const CLOUD_DB_URL = 'https://extendsclass.com/api/json-storage/bin/caaeadf'
+// Universal Pooled Incident Reports Service
+// Communicates with /api/reports for seamless Vercel cloud and local dev syncing
 
 export const DEFAULT_REPORTS = [
   {
@@ -43,9 +41,8 @@ export const reportService = {
   },
 
   getReports: async () => {
-    // 1. Fetch from Global Cloud Database (Vercel & multi-device sync)
     try {
-      const res = await fetch(CLOUD_DB_URL, { cache: 'no-store' })
+      const res = await fetch('/api/reports', { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         if (Array.isArray(data) && data.length > 0) {
@@ -54,23 +51,32 @@ export const reportService = {
         }
       }
     } catch (e) {
-      console.warn('Cloud DB fetch failed, checking local API/cache', e)
+      console.warn('Failed to fetch /api/reports, using local cache', e)
     }
-
-    // 2. Fallback to local Vite API if running locally
-    try {
-      const localRes = await fetch('/api/reports')
-      if (localRes.ok) {
-        const localData = await localRes.json()
-        if (Array.isArray(localData)) return localData
-      }
-    } catch (err) {}
 
     return reportService.getInitialReports()
   },
 
   addReport: async (newReport) => {
-    const current = await reportService.getReports()
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newReport)
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.report) {
+          if (data.all) localStorage.setItem('sih_citizen_reports', JSON.stringify(data.all))
+          return data.report
+        }
+      }
+    } catch (e) {
+      console.warn('POST /api/reports failed, saving locally', e)
+    }
+
+    // Local fallback
+    const current = reportService.getInitialReports()
     const reportId = `CR-${100 + current.length + 1}`
     const fullReport = {
       id: reportId,
@@ -80,55 +86,30 @@ export const reportService = {
       ...newReport
     }
     const updated = [fullReport, ...current]
-
-    // 1. Push to Global Cloud Database so everyone sees it instantly
-    try {
-      await fetch(CLOUD_DB_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated)
-      })
-    } catch (e) {
-      console.warn('Cloud DB PUT failed, saving to local store', e)
-    }
-
-    // 2. Local fallback
-    try {
-      fetch('/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReport)
-      }).catch(() => {})
-    } catch (err) {}
-
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return fullReport
   },
 
   updateStatus: async (id, status) => {
-    const current = await reportService.getReports()
-    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
-
-    // 1. Update Global Cloud Database
     try {
-      await fetch(CLOUD_DB_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated)
-      })
-    } catch (e) {
-      console.warn('Cloud DB update failed', e)
-    }
-
-    // 2. Local API fallback
-    try {
-      fetch('/api/reports', {
+      const res = await fetch('/api/reports', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status })
-      }).catch(() => {})
-    } catch (err) {}
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.reports) {
+          localStorage.setItem('sih_citizen_reports', JSON.stringify(data.reports))
+          return data.reports
+        }
+      }
+    } catch (e) {
+      console.warn('PATCH /api/reports failed, saving locally', e)
+    }
 
+    const current = reportService.getInitialReports()
+    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return updated
   }
