@@ -39,7 +39,7 @@ export default function Header({ meta, language, onLanguageChange, labels, curre
                 alignItems: 'center',
                 gap: '8px',
                 background: 'rgba(255, 255, 255, 0.06)',
-                border: `1px solid ${getRoleColor(currentUser.role)}`,
+                border: `1.5px solid ${getRoleColor(currentUser.role)}`,
                 borderRadius: '8px',
                 padding: '6px 12px',
                 color: '#fff',
@@ -52,10 +52,10 @@ export default function Header({ meta, language, onLanguageChange, labels, curre
               {getRoleIcon(currentUser.role)}
               <div>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, lineHeight: 1.1 }}>
-                  {currentUser.name}
+                  {currentUser.role === 'viewer' ? 'Tenzing Lepcha (Citizen)' : currentUser.role === 'analyst' ? 'Dr. P. Roy (GIS Lead)' : currentUser.name}
                 </div>
                 <div style={{ fontSize: '0.65rem', color: '#cad5e2', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  {currentUser.roleLabel || currentUser.role}
+                  {currentUser.role === 'viewer' ? 'PUBLIC CITIZEN' : currentUser.role === 'analyst' ? 'GIS SCIENTIST (ANALYST)' : 'DISASTER COMMANDER (ADMIN)'}
                 </div>
               </div>
               <KeyRound size={13} style={{ color: '#9ec8b9', marginLeft: '4px' }} />

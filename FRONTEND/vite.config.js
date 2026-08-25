@@ -44,13 +44,24 @@ function ensureStorage() {
   }
 }
 
-// Custom Vite Middleware for Shared Pooled Reports & IP Detection
+// Custom Vite Middleware for Shared Pooled Reports & IP Detection with full CORS
 function apiMiddlewarePlugin() {
   ensureStorage()
   return {
     name: 'sih-shared-api-middleware',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
+        // Full CORS support for cross-device mobile connections
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.end()
+          return
+        }
+
         const url = req.url.split('?')[0]
 
         // 1. IP Detection Endpoint
@@ -121,6 +132,7 @@ function apiMiddlewarePlugin() {
                 res.setHeader('Content-Type', 'application/json')
                 res.end(JSON.stringify({ success: true, report: fullReport, all: updated }))
               } catch (e) {
+                console.error('Error saving pooled report:', e)
                 res.statusCode = 400
                 res.end(JSON.stringify({ error: 'Invalid report payload' }))
               }

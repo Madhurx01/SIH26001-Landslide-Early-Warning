@@ -59,20 +59,44 @@ export default function CitizenReportModal({ open, onClose, onReportSubmitted })
     )
   }
 
-  // 2. Mobile Camera Photo Handling
+  // 2. Mobile Camera Photo Handling with High-Speed Canvas Compression
   const handlePhotoCapture = (e) => {
     const file = e.target.files[0]
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setPhotoPreview(reader.result)
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          const maxDim = 600
+          let width = img.width
+          let height = img.height
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width)
+              width = maxDim
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height)
+              height = maxDim
+            }
+          }
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, 0, 0, width, height)
+          const compressed = canvas.toDataURL('image/jpeg', 0.65)
+          setPhotoPreview(compressed)
+        }
+        img.src = reader.result
       }
       reader.readAsDataURL(file)
     }
   }
 
   // 3. Persistent Submit Handler
-  const submitReport = (e) => {
+  const submitReport = async (e) => {
     e.preventDefault()
     const reportData = {
       location: location || 'NH-10 Corridor, Sikkim',
@@ -83,8 +107,8 @@ export default function CitizenReportModal({ open, onClose, onReportSubmitted })
       photoUrl: photoPreview
     }
 
-    const saved = reportService.addReport(reportData)
-    setLastReportId(saved.id)
+    const saved = await reportService.addReport(reportData)
+    setLastReportId(saved?.id || 'CR-NEW')
     if (onReportSubmitted) onReportSubmitted(saved)
     setSubmitted(true)
   }

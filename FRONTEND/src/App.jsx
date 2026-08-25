@@ -242,6 +242,7 @@ export default function App() {
             acknowledged={acknowledged}
             onAcknowledge={(id) => setAcknowledged((current) => [...current, id])}
             onView={viewAlertOnMap}
+            isAdmin={currentUser?.role === 'admin'}
           />
         </div>
 
