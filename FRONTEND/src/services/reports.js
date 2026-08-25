@@ -1,5 +1,5 @@
 // Permanent Google Cloud Firebase Realtime Database Sync Service
-// 24/7/365 Real-Time Cross-Device Synchronization for Vercel, Mobile, and Desktop Command
+// 24/7/365 Real-Time Cross-Device Synchronization with Verbose Telemetry Logging
 
 export const FIREBASE_DB_URL = 'https://sih-26001-default-rtdb.firebaseio.com/reports.json'
 
@@ -45,22 +45,31 @@ export const reportService = {
   getReports: async () => {
     // 1. Primary: Google Firebase Realtime Database (Instant Global Cloud Sync)
     try {
+      const startTime = performance.now()
       const res = await fetch(FIREBASE_DB_URL, { cache: 'no-store' })
+      const latency = Math.round(performance.now() - startTime)
+
       if (res.ok) {
         const data = await res.json()
+        let cleanList = []
         if (Array.isArray(data) && data.length > 0) {
-          localStorage.setItem('sih_citizen_reports', JSON.stringify(data))
-          return data
+          cleanList = data
         } else if (data && typeof data === 'object') {
-          const list = Object.values(data)
-          if (list.length > 0) {
-            localStorage.setItem('sih_citizen_reports', JSON.stringify(list))
-            return list
-          }
+          cleanList = Object.values(data)
+        }
+
+        if (cleanList.length > 0) {
+          localStorage.setItem('sih_citizen_reports', JSON.stringify(cleanList))
+          // Detailed sync log
+          console.log(
+            `%c☁️ [FIREBASE SYNC] Live sync completed in ${latency}ms | Total Cloud Reports: ${cleanList.length}`,
+            'color: #26d0ce; font-size: 11px; font-family: monospace;'
+          )
+          return cleanList
         }
       }
     } catch (e) {
-      console.warn('Firebase RTDB fetch failed, checking local store', e)
+      console.warn('⚠️ [FIREBASE SYNC WARNING] Cloud fetch issue, using local cache:', e)
     }
 
     // 2. Secondary: Local /api/reports fallback
@@ -76,6 +85,15 @@ export const reportService = {
   },
 
   addReport: async (newReport) => {
+    console.log('%c🚀 [CITIZEN UPLOAD INITIATED]', 'background: #09272d; color: #26d0ce; font-weight: bold; padding: 4px 8px; border-radius: 4px;')
+    console.table({
+      Location: newReport.location,
+      Coordinates: newReport.coords,
+      Reporter: newReport.reportedBy,
+      Traffic_Impact: newReport.roadBlocked,
+      Photo_Attached: newReport.photoUrl ? 'YES (Base64 Canvas Compressed)' : 'NO'
+    })
+
     const current = await reportService.getReports()
     const reportId = `CR-${100 + current.length + 1}`
     const fullReport = {
@@ -89,13 +107,24 @@ export const reportService = {
 
     // 1. Direct Cloud PUT to Firebase Realtime Database
     try {
-      await fetch(FIREBASE_DB_URL, {
+      const startTime = performance.now()
+      const res = await fetch(FIREBASE_DB_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       })
+      const uploadDuration = Math.round(performance.now() - startTime)
+
+      if (res.ok) {
+        console.log(
+          `%c✅ [FIREBASE CLOUD SUCCESS] Report ${fullReport.id} published to Google Cloud in ${uploadDuration}ms!`,
+          'background: #27865f; color: #fff; font-weight: bold; padding: 4px 8px; border-radius: 4px;'
+        )
+      } else {
+        console.warn('⚠️ [FIREBASE UPLOAD FAILED] Status code:', res.status)
+      }
     } catch (e) {
-      console.warn('Firebase PUT failed, saving locally', e)
+      console.error('❌ [FIREBASE UPLOAD ERROR]:', e)
     }
 
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
@@ -103,18 +132,19 @@ export const reportService = {
   },
 
   updateStatus: async (id, status) => {
+    console.log(`%c🛡️ [ADMIN COMMAND ACTION] Updating ${id} -> ${status}`, 'color: #ff8a93; font-weight: bold;')
     const current = await reportService.getReports()
     const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
 
-    // 1. Update Cloud Firebase Realtime Database
     try {
       await fetch(FIREBASE_DB_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       })
+      console.log(`%c✅ [STATUS SYNCED] ${id} status updated on Firebase Cloud DB`, 'color: #74e0b1;')
     } catch (e) {
-      console.warn('Firebase status update failed', e)
+      console.warn('Firebase status update failed:', e)
     }
 
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))

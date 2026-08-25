@@ -30,9 +30,26 @@ export default function ReportVerificationPanel({ reports, onStatusChange }) {
           <ShieldCheck size={20} style={{ color: '#c7353f' }} />
           <h2>Citizen Incident Verification Queue (Admin Authority)</h2>
         </div>
-        <span className="badge" style={{ background: '#c7353f', color: '#fff' }}>
-          {pendingCount} Pending Verification
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{
+            fontSize: '0.72rem',
+            background: 'rgba(38, 208, 206, 0.15)',
+            border: '1px solid #26d0ce',
+            color: '#26d0ce',
+            padding: '3px 8px',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontWeight: 600
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#26d0ce', display: 'inline-block' }} />
+            Firebase Realtime Cloud Sync Active
+          </span>
+          <span className="badge" style={{ background: '#c7353f', color: '#fff' }}>
+            {pendingCount} Pending Verification
+          </span>
+        </div>
       </div>
 
       <p style={{ fontSize: '0.8rem', color: '#cad5e2', margin: '0.35rem 0 1rem 0' }}>
