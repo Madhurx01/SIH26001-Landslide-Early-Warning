@@ -1,5 +1,7 @@
-// Universal Pooled Incident Reports Service
-// Communicates with /api/reports for seamless Vercel cloud and local dev syncing
+// Dedicated Live Shared Pool Storage Service
+// Direct connection to Dedicated Storage Server (https://d46babf2acd1b6.lhr.life)
+
+export const STORAGE_SERVER_URL = 'https://d46babf2acd1b6.lhr.life/api/reports'
 
 export const DEFAULT_REPORTS = [
   {
@@ -41,8 +43,9 @@ export const reportService = {
   },
 
   getReports: async () => {
+    // 1. Primary: Dedicated Live Storage Server
     try {
-      const res = await fetch('/api/reports', { cache: 'no-store' })
+      const res = await fetch(STORAGE_SERVER_URL, { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         if (Array.isArray(data) && data.length > 0) {
@@ -51,15 +54,25 @@ export const reportService = {
         }
       }
     } catch (e) {
-      console.warn('Failed to fetch /api/reports, using local cache', e)
+      console.warn('Dedicated storage server unavailable, checking local endpoint', e)
     }
+
+    // 2. Secondary: Local /api/reports endpoint
+    try {
+      const res2 = await fetch('/api/reports', { cache: 'no-store' })
+      if (res2.ok) {
+        const data2 = await res2.json()
+        if (Array.isArray(data2) && data2.length > 0) return data2
+      }
+    } catch (err) {}
 
     return reportService.getInitialReports()
   },
 
   addReport: async (newReport) => {
+    // 1. Primary: POST to Dedicated Live Storage Server
     try {
-      const res = await fetch('/api/reports', {
+      const res = await fetch(STORAGE_SERVER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newReport)
@@ -72,10 +85,23 @@ export const reportService = {
         }
       }
     } catch (e) {
-      console.warn('POST /api/reports failed, saving locally', e)
+      console.warn('Dedicated storage POST failed, attempting local fallback', e)
     }
 
-    // Local fallback
+    // 2. Secondary fallback
+    try {
+      const res2 = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newReport)
+      })
+      if (res2.ok) {
+        const data2 = await res2.json()
+        if (data2.report) return data2.report
+      }
+    } catch (err) {}
+
+    // 3. Local storage fallback
     const current = reportService.getInitialReports()
     const reportId = `CR-${100 + current.length + 1}`
     const fullReport = {
@@ -91,8 +117,9 @@ export const reportService = {
   },
 
   updateStatus: async (id, status) => {
+    // 1. Primary: PATCH to Dedicated Live Storage Server
     try {
-      const res = await fetch('/api/reports', {
+      const res = await fetch(STORAGE_SERVER_URL, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status })
@@ -105,7 +132,7 @@ export const reportService = {
         }
       }
     } catch (e) {
-      console.warn('PATCH /api/reports failed, saving locally', e)
+      console.warn('Dedicated storage PATCH failed', e)
     }
 
     const current = reportService.getInitialReports()
