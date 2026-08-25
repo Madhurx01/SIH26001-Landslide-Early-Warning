@@ -1,5 +1,7 @@
-// Shared Pooled Cloud Storage Service for Citizen Reports
-// Real-time synchronization across Mobile devices and Desktop Admin consoles
+// Global Cloud-Synchronized Storage Service for Citizen Incident Reports
+// Real-time synchronization across Vercel deployments, mobile devices, and admin laptops
+
+const CLOUD_DB_URL = 'https://extendsclass.com/api/json-storage/bin/caaeadf'
 
 export const DEFAULT_REPORTS = [
   {
@@ -34,46 +36,41 @@ export const reportService = {
       const stored = localStorage.getItem('sih_citizen_reports')
       if (stored) {
         const parsed = JSON.parse(stored)
-        if (Array.isArray(parsed)) return parsed
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
       }
     } catch (e) {}
     return DEFAULT_REPORTS
   },
 
   getReports: async () => {
+    // 1. Fetch from Global Cloud Database (Vercel & multi-device sync)
     try {
-      const res = await fetch('/api/reports')
+      const res = await fetch(CLOUD_DB_URL, { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           localStorage.setItem('sih_citizen_reports', JSON.stringify(data))
           return data
         }
       }
     } catch (e) {
-      console.warn('API fetch failed, falling back to local store', e)
+      console.warn('Cloud DB fetch failed, checking local API/cache', e)
     }
+
+    // 2. Fallback to local Vite API if running locally
+    try {
+      const localRes = await fetch('/api/reports')
+      if (localRes.ok) {
+        const localData = await localRes.json()
+        if (Array.isArray(localData)) return localData
+      }
+    } catch (err) {}
 
     return reportService.getInitialReports()
   },
 
   addReport: async (newReport) => {
-    try {
-      const res = await fetch('/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReport)
-      })
-      if (res.ok) {
-        const data = await res.json()
-        return data.report
-      }
-    } catch (e) {
-      console.warn('Pooled API POST failed, saving to local store', e)
-    }
-
-    // Local fallback
-    const current = reportService.getInitialReports()
+    const current = await reportService.getReports()
     const reportId = `CR-${100 + current.length + 1}`
     const fullReport = {
       id: reportId,
@@ -83,27 +80,55 @@ export const reportService = {
       ...newReport
     }
     const updated = [fullReport, ...current]
+
+    // 1. Push to Global Cloud Database so everyone sees it instantly
+    try {
+      await fetch(CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      })
+    } catch (e) {
+      console.warn('Cloud DB PUT failed, saving to local store', e)
+    }
+
+    // 2. Local fallback
+    try {
+      fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newReport)
+      }).catch(() => {})
+    } catch (err) {}
+
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return fullReport
   },
 
   updateStatus: async (id, status) => {
+    const current = await reportService.getReports()
+    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
+
+    // 1. Update Global Cloud Database
     try {
-      const res = await fetch('/api/reports', {
+      await fetch(CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      })
+    } catch (e) {
+      console.warn('Cloud DB update failed', e)
+    }
+
+    // 2. Local API fallback
+    try {
+      fetch('/api/reports', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status })
-      })
-      if (res.ok) {
-        const data = await res.json()
-        return data.reports
-      }
-    } catch (e) {
-      console.warn('Pooled API PATCH failed, updating local store', e)
-    }
+      }).catch(() => {})
+    } catch (err) {}
 
-    const current = reportService.getInitialReports()
-    const updated = current.map((r) => (r.id === id ? { ...r, status } : r))
     localStorage.setItem('sih_citizen_reports', JSON.stringify(updated))
     return updated
   }
