@@ -68,6 +68,7 @@ export default function Header({ meta, language, onLanguageChange, labels, curre
             <span>{labels.language}</span>
             <select value={language} onChange={(event) => onLanguageChange(event.target.value)} aria-label="Language">
               <option value="en">English</option>
+              <option value="ne">नेपाली (Nepali)</option>
               <option value="hi">हिन्दी</option>
             </select>
             <ChevronDown size={14} aria-hidden="true" />

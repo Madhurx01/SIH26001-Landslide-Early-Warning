@@ -2,9 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'fs'
 import path from 'path'
+import { exec } from 'child_process'
 
 const DB_PATH = path.resolve(__dirname, 'src/data/pooledReportsDb.json')
 const WHITELIST_PATH = path.resolve(__dirname, 'src/data/ipWhitelist.json')
+const ADB_SCRIPT = path.resolve(__dirname, 'server/send_sms_adb.py')
 
 const DEFAULT_REPORTS = [
   {
@@ -44,14 +46,13 @@ function ensureStorage() {
   }
 }
 
-// Custom Vite Middleware for Shared Pooled Reports & IP Detection with full CORS
+// Custom Vite Middleware for ADB USB Bridge, Shared Pooled Reports & IP Detection
 function apiMiddlewarePlugin() {
   ensureStorage()
   return {
     name: 'sih-shared-api-middleware',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        // Full CORS support for cross-device mobile connections
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
@@ -64,7 +65,63 @@ function apiMiddlewarePlugin() {
 
         const url = req.url.split('?')[0]
 
-        // 1. IP Detection Endpoint
+        // 1. ADB Status Check Endpoint
+        if (url === '/api/adbStatus' && req.method === 'GET') {
+          exec(`python3 "${ADB_SCRIPT}" status`, (error, stdout) => {
+            res.setHeader('Content-Type', 'application/json')
+            try {
+              res.end(stdout.trim() || JSON.stringify({ connected: false }))
+            } catch (e) {
+              res.end(JSON.stringify({ connected: false, error: e.message }))
+            }
+          })
+          return
+        }
+
+        // 2. ADB SMS Dispatch Endpoint
+        if (url === '/api/sendAdbSms' && req.method === 'POST') {
+          let body = ''
+          req.on('data', chunk => { body += chunk })
+          req.on('end', () => {
+            try {
+              const { numbers = [], message = '' } = JSON.parse(body)
+              const results = []
+              let count = 0
+
+              if (numbers.length === 0) {
+                res.setHeader('Content-Type', 'application/json')
+                res.statusCode = 400
+                res.end(JSON.stringify({ success: false, error: 'No phone numbers provided' }))
+                return
+              }
+
+              numbers.forEach((num) => {
+                const escapedMsg = message.replace(/"/g, '\\"')
+                exec(`python3 "${ADB_SCRIPT}" "${num}" "${escapedMsg}"`, (error, stdout) => {
+                  try {
+                    results.push(JSON.parse(stdout.trim()))
+                  } catch (e) {
+                    results.push({ number: num, success: false, error: stdout })
+                  }
+                  count++
+                  if (count === numbers.length) {
+                    res.setHeader('Content-Type', 'application/json')
+                    const anySuccess = results.some(r => r.success)
+                    res.statusCode = anySuccess ? 200 : 400
+                    res.end(JSON.stringify({ success: anySuccess, results }))
+                  }
+                })
+              })
+            } catch (e) {
+              res.setHeader('Content-Type', 'application/json')
+              res.statusCode = 400
+              res.end(JSON.stringify({ success: false, error: e.message }))
+            }
+          })
+          return
+        }
+
+        // 3. IP Detection Endpoint
         if (url === '/api/ip' && req.method === 'GET') {
           const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1'
           res.setHeader('Content-Type', 'application/json')
@@ -72,7 +129,7 @@ function apiMiddlewarePlugin() {
           return
         }
 
-        // 2. IP Whitelist Management
+        // 4. IP Whitelist Management
         if (url === '/api/whitelist') {
           if (req.method === 'GET') {
             ensureStorage()
@@ -103,7 +160,7 @@ function apiMiddlewarePlugin() {
           }
         }
 
-        // 3. Shared Pooled Reports Store
+        // 5. Shared Pooled Reports Store
         if (url === '/api/reports') {
           if (req.method === 'GET') {
             ensureStorage()

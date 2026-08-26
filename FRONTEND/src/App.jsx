@@ -13,18 +13,22 @@ import AlertsPanel from './components/AlertsPanel'
 import CitizenReportModal from './components/CitizenReportModal'
 import AuthModal from './components/AuthModal'
 import ReportVerificationPanel from './components/ReportVerificationPanel'
+import SmsBroadcastModal from './components/SmsBroadcastModal'
 import api from './services/api'
 import authService, { PRESET_USERS } from './services/auth'
 import reportService from './services/reports'
 
 const labels = {
   en: { title: 'AI-Based Landslide Early Warning & Risk Monitoring', pilot: 'Pilot', systemStatus: 'System Status', language: 'Language', dashboard: 'Dashboard', riskMap: 'Risk Map', citizenReport: 'Citizen Report' },
+  ne: { title: 'एआई-आधारित पहिरो पूर्व चेतावनी तथा जोखिम निगरानी', pilot: 'पाइलट', systemStatus: 'प्रणाली स्थिति', language: 'भाषा', dashboard: 'ड्यासबोर्ड', riskMap: 'जोखिम नक्सा', citizenReport: 'नागरिक रिपोर्ट' },
   hi: { title: 'AI आधारित भूस्खलन पूर्व चेतावनी एवं जोखिम निगरानी', pilot: 'पायलट', systemStatus: 'सिस्टम स्थिति', language: 'भाषा', dashboard: 'डैशबोर्ड', riskMap: 'जोखिम मानचित्र', citizenReport: 'नागरिक रिपोर्ट' },
 }
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUser() || PRESET_USERS.viewer)
   const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [broadcastModalOpen, setBroadcastModalOpen] = useState(false)
+  const [broadcastAlertData, setBroadcastAlertData] = useState(null)
   const [citizenReports, setCitizenReports] = useState(() => reportService.getInitialReports())
   const [data, setData] = useState(null)
   const [selectedCell, setSelectedCell] = useState(null)
@@ -243,6 +247,10 @@ export default function App() {
             onAcknowledge={(id) => setAcknowledged((current) => [...current, id])}
             onView={viewAlertOnMap}
             isAdmin={currentUser?.role === 'admin'}
+            onOpenBroadcastModal={(alert) => {
+              setBroadcastAlertData(alert)
+              setBroadcastModalOpen(true)
+            }}
           />
         </div>
 
@@ -338,6 +346,14 @@ export default function App() {
         currentUser={currentUser}
         onLogin={(roleKey) => setCurrentUser(authService.login(roleKey))}
       />
+
+      {/* NDMA CAP & Cell Broadcast SMS Modal */}
+      {broadcastModalOpen && (
+        <SmsBroadcastModal
+          activeAlert={broadcastAlertData}
+          onClose={() => setBroadcastModalOpen(false)}
+        />
+      )}
     </div>
   )
 }
