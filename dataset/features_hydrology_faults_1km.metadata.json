@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "data_origin": "authoritative_geospatial_vectors",
+  "synthetic_fallback_used": false,
+  "manual_geometry_used": false,
+  "generated_at_utc": "2026-09-24T04:42:00.498996+00:00",
+  "source_access_date_utc": "2026-09-24",
+  "output_csv": "dataset/features_hydrology_faults_1km.csv",
+  "output_columns": [
+    "cell_id",
+    "distance_to_drainage_km",
+    "distance_to_fault_km"
+  ],
+  "output_row_count": 7390,
+  "ordered_cell_validation": true,
+  "canonical_grid": {
+    "path": "DATA/PROCESSED/GRID/sikkim_grid_1km.gpkg",
+    "crs": "EPSG:32645",
+    "row_count": 7390,
+    "cell_id_first": "SKM_00001",
+    "cell_id_last": "SKM_07390",
+    "cell_size_metres": 1000,
+    "geometry_unchanged": true
+  },
+  "boundary": "DATA/PROCESSED/STATIC/BOUNDARY/sikkim_boundary_utm45n.gpkg",
+  "static_alignment_reference": "DATA/PROCESSED/FEATURES/sikkim_static_features_1km.csv",
+  "sources": {
+    "fault": {
+      "provider": "Global Earthquake Model (GEM) Foundation",
+      "dataset": "GEM Global Active Faults Database, harmonized GeoJSON",
+      "role": "active_fault_proxy",
+      "source_url": "https://raw.githubusercontent.com/GEMScienceTools/gem-global-active-faults/56816508ad92fd6846dad1163b1c8c01376a2cd1/geojson/gem_active_faults_harmonized.geojson",
+      "repository_commit_url": "https://github.com/GEMScienceTools/gem-global-active-faults/commit/56816508ad92fd6846dad1163b1c8c01376a2cd1",
+      "revision": "56816508ad92fd6846dad1163b1c8c01376a2cd1",
+      "revision_is_immutable_commit": true,
+      "source_content_sha256": "37babb516edfac22b5ae91744495d8546b3ae4676b4d4f68cc77da8222df20e1",
+      "source_bytes": 10622730,
+      "source_feature_count_total": 13696,
+      "source_line_feature_count_total": 13696,
+      "source_feature_count_used": 8,
+      "line_geometry_count_used": 8,
+      "invalid_features_repaired": 0,
+      "license": "CC BY-SA 4.0"
+    },
+    "drainage": {
+      "provider": "OpenStreetMap contributors",
+      "dataset": "OSM waterways via Overpass API",
+      "role": "drainage_network",
+      "api_endpoint_used": "https://overpass-api.de/api/interpreter",
+      "api_endpoints_attempted": [
+        "https://overpass-api.de/api/interpreter"
+      ],
+      "source_url": "https://www.openstreetmap.org/",
+      "osm_base_timestamp": "2026-09-24T04:40:17Z",
+      "overpass_generator": "Overpass API 0.7.62.11 87bfad18",
+      "overpass_query": "[out:json][timeout:120];(way[\"waterway\"~\"^(river|stream|canal)$\"](26.9890068,87.9111326,28.2142056,89.0222002););out geom;",
+      "waterway_tags": [
+        "river",
+        "stream",
+        "canal"
+      ],
+      "response_content_sha256": "9bc15ef7097d0854cf95e10bf678b5fefb49ebcae8e04180d44f80ebef94f1fa",
+      "response_bytes": 8179640,
+      "source_element_count_total": 2155,
+      "source_way_count_valid": 2155,
+      "source_feature_count_used": 1678,
+      "line_geometry_count_used": 1684,
+      "invalid_features_repaired": 0,
+      "minimum_required_waterway_ways": 10,
+      "osm_way_id_min": 27915627,
+      "osm_way_id_max": 1551357067,
+      "license": "Open Data Commons Open Database License (ODbL)"
+    }
+  },
+  "parameters": {
+    "target_crs": "EPSG:32645",
+    "distance_point": "canonical grid centroid_x/centroid_y",
+    "distance_method": "exact Shapely point-to-LineString nearest distance",
+    "distance_units": "kilometres",
+    "fault_source_buffer_km": 100.0,
+    "drainage_source_buffer_km": 10.0,
+    "minimum_drainage_ways": 10
+  },
+  "qa": {
+    "row_count": 7390,
+    "unique_cell_id_count": 7390,
+    "ordered_cell_ids_match_canonical_grid": true,
+    "missing_values": {
+      "cell_id": 0,
+      "distance_to_drainage_km": 0,
+      "distance_to_fault_km": 0
+    },
+    "distance_to_drainage_km": {
+      "min": 0.000177,
+      "median": 0.981892,
+      "max": 14.175677
+    },
+    "distance_to_fault_km": {
+      "min": 1.506432,
+      "median": 37.3443635,
+      "max": 72.154624
+    }
+  },
+  "limitations": [
+    "GEM is an active-fault proxy/source, not GSI lithology or a complete geological map.",
+    "OSM waterways are community-maintained and completeness varies spatially.",
+    "Distances are from canonical 1 km cell centroids; source vectors are not 1 km data.",
+    "No lithology feature is produced by this workflow."
+  ],
+  "output_sha256": "9425305e52f8331054753c6576e1a5adfa8296f9e58f251c10046482f9f62a73"
+}

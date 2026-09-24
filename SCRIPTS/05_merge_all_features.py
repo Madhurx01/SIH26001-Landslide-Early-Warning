@@ -18,6 +18,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATASET_DIR = PROJECT_ROOT / "dataset"
 NDVI_PATH = DATASET_DIR / "features_ndvi_1km.csv"
 NDVI_METADATA_PATH = DATASET_DIR / "features_ndvi_1km.metadata.json"
+HYDRO_PATH = DATASET_DIR / "features_hydrology_faults_1km.csv"
+HYDRO_METADATA_PATH = DATASET_DIR / "features_hydrology_faults_1km.metadata.json"
+EXPECTED_GEM_REVISION = "56816508ad92fd6846dad1163b1c8c01376a2cd1"
+EXPECTED_GEM_SOURCE_SHA256 = (
+    "37babb516edfac22b5ae91744495d8546b3ae4676b4d4f68cc77da8222df20e1"
+)
+EXPECTED_HYDRO_COLUMNS = [
+    "cell_id", "distance_to_drainage_km", "distance_to_fault_km"
+]
 
 
 def sha256_file(path):
@@ -54,19 +63,115 @@ def validate_satellite_ndvi(base_df, ndvi_df):
     if not valid_values.between(-1.0, 1.0).all():
         raise RuntimeError("NDVI contains values outside the physical [-1, 1] range")
 
+
+def validate_hydrology_faults(base_df, hydro_df):
+    """Reject synthetic, stale, or misaligned drainage/fault features."""
+    if not HYDRO_METADATA_PATH.is_file():
+        raise RuntimeError(
+            "Hydrology/fault provenance is missing. Run "
+            "SCRIPTS/02_fetch_hydrology_faults.py; unverified legacy files are rejected."
+        )
+    try:
+        metadata = json.loads(HYDRO_METADATA_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError("Hydrology/fault provenance is unreadable or invalid JSON") from error
+    if (
+        metadata.get("schema_version") != 1
+        or metadata.get("data_origin") != "authoritative_geospatial_vectors"
+        or metadata.get("synthetic_fallback_used") is not False
+        or metadata.get("manual_geometry_used") is not False
+        or metadata.get("output_columns") != EXPECTED_HYDRO_COLUMNS
+        or not metadata.get("source_access_date_utc")
+    ):
+        raise RuntimeError(
+            "Hydrology/fault provenance permits synthetic or manual geometry"
+        )
+    sources = metadata.get("sources")
+    if not isinstance(sources, dict):
+        raise RuntimeError("Hydrology/fault provenance has no source records")
+    fault = sources.get("fault", {})
+    drainage = sources.get("drainage", {})
+    if (
+        fault.get("provider") != "Global Earthquake Model (GEM) Foundation"
+        or fault.get("role") != "active_fault_proxy"
+        or fault.get("revision") != EXPECTED_GEM_REVISION
+        or fault.get("source_content_sha256") != EXPECTED_GEM_SOURCE_SHA256
+        or fault.get("revision_is_immutable_commit") is not True
+        or EXPECTED_GEM_REVISION not in str(fault.get("source_url", ""))
+    ):
+        raise RuntimeError("Fault provenance is not the approved immutable GEM revision")
+    if (
+        drainage.get("provider") != "OpenStreetMap contributors"
+        or drainage.get("role") != "drainage_network"
+        or "overpass" not in str(drainage.get("api_endpoint_used", "")).lower()
+        or not drainage.get("osm_base_timestamp")
+    ):
+        raise RuntimeError("Drainage provenance is not a real OSM Overpass source")
+    for label, source in (("fault", fault), ("drainage", drainage)):
+        if not isinstance(source.get("source_feature_count_used"), int):
+            raise RuntimeError(f"{label.title()} provenance has no source feature count")
+        if source["source_feature_count_used"] <= 0:
+            raise RuntimeError(f"{label.title()} provenance reports no real source features")
+        if not isinstance(source.get("line_geometry_count_used"), int):
+            raise RuntimeError(f"{label.title()} provenance has no geometry count")
+        if source["line_geometry_count_used"] <= 0:
+            raise RuntimeError(f"{label.title()} provenance reports no real geometry")
+    if metadata.get("parameters", {}).get("target_crs") != "EPSG:32645":
+        raise RuntimeError("Hydrology/fault distances were not calculated in EPSG:32645")
+    if metadata.get("parameters", {}).get("distance_method") != (
+        "exact Shapely point-to-LineString nearest distance"
+    ):
+        raise RuntimeError("Hydrology/fault provenance does not identify exact line distance")
+    if metadata.get("output_sha256") != sha256_file(HYDRO_PATH):
+        raise RuntimeError(
+            "Hydrology/fault CSV checksum does not match its provenance sidecar"
+        )
+    if list(hydro_df.columns) != EXPECTED_HYDRO_COLUMNS:
+        raise RuntimeError(
+            "Hydrology/fault CSV must contain exactly: "
+            + ", ".join(EXPECTED_HYDRO_COLUMNS)
+        )
+    if hydro_df["cell_id"].isna().any() or hydro_df["cell_id"].duplicated().any():
+        raise RuntimeError("Hydrology/fault cell_id values must be non-null and unique")
+    base_ids = base_df["cell_id"].astype(str).tolist()
+    hydro_ids = hydro_df["cell_id"].astype(str).tolist()
+    if hydro_ids != base_ids:
+        raise RuntimeError(
+            "Hydrology/fault cell_id rows are not exactly aligned with the base dataset"
+        )
+    if (
+        metadata.get("output_row_count") != len(hydro_df)
+        or metadata.get("ordered_cell_validation") is not True
+        or metadata.get("canonical_grid", {}).get("row_count") != len(base_df)
+        or metadata.get("canonical_grid", {}).get("geometry_unchanged") is not True
+        or metadata.get("qa", {}).get("unique_cell_id_count") != len(base_df)
+        or metadata.get("qa", {}).get(
+            "ordered_cell_ids_match_canonical_grid"
+        ) is not True
+    ):
+        raise RuntimeError("Hydrology/fault row/grid provenance is inconsistent")
+    numeric = hydro_df[EXPECTED_HYDRO_COLUMNS[1:]].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    if numeric.isna().any().any() or not np.isfinite(numeric.to_numpy()).all():
+        raise RuntimeError("Hydrology/fault distances contain missing or non-finite values")
+    if (numeric < 0).any().any():
+        raise RuntimeError("Hydrology/fault distances contain negative values")
+
 def main():
     print("=== Step 5: Merging All Static Features into Master Dataset ===")
     
     base_df = pd.read_csv("dataset/sikkim_static_features_1km.csv")
     clim_df = pd.read_csv("dataset/features_climatic_1km.csv")
-    hydro_df = pd.read_csv("dataset/features_hydrology_faults_1km.csv")
+    hydro_df = pd.read_csv(HYDRO_PATH)
     morph_df = pd.read_csv("dataset/features_morphometry_1km.csv")
     ndvi_df = pd.read_csv(NDVI_PATH)
+    validate_hydrology_faults(base_df, hydro_df)
     validate_satellite_ndvi(base_df, ndvi_df)
     
     # Sequential joins on cell_id
     merged = base_df.merge(clim_df, on='cell_id', how='left')
-    merged = merged.merge(hydro_df, on='cell_id', how='left')
+    merged = merged.merge(hydro_df, on='cell_id', how='left', validate='one_to_one')
     merged = merged.merge(morph_df, on='cell_id', how='left')
     merged = merged.merge(ndvi_df, on='cell_id', how='left', validate='one_to_one')
     
