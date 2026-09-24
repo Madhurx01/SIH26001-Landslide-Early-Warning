@@ -17,6 +17,11 @@ export default function SelectedCellPanel({ cell, telemetry }) {
   const liveSource = telemetry?.state === 'fresh'
     ? 'Open-Meteo model/API data'
     : cell.telemetry_source || 'Telemetry unavailable'
+  const forecastRisk = [
+    ['Next 24h', cell.operational_risk_index_24h, cell.risk_level_24h],
+    ['Next 48h', cell.operational_risk_index_48h, cell.risk_level_48h],
+    ['Next 72h', cell.operational_risk_index_72h, cell.risk_level_72h],
+  ]
 
   return (
     <section className="panel selected-panel">
@@ -35,6 +40,19 @@ export default function SelectedCellPanel({ cell, telemetry }) {
           <span style={{ width: `${index}%`, background: index >= 75 ? '#d7191c' : index >= 50 ? '#e16713' : index >= 20 ? '#b87808' : '#27865f' }} />
         </div>
         <small>Static susceptibility plus weather triggers · not a calibrated occurrence probability</small>
+      </div>
+
+      <div className="detail-section">
+        <h3>Forecast-based risk</h3>
+        <div className="detail-metrics two-col">
+          {forecastRisk.map(([label, value, level]) => (
+            <div className="detail-metric" key={label}>
+              <CloudRain size={16} />
+              <span>{label}<strong>{display(value, '/100')}</strong><SeverityBadge level={level} /></span>
+            </div>
+          ))}
+        </div>
+        <small>Forecast-based index values are not observed events or guaranteed predictions.</small>
       </div>
 
       <div className="detail-section" style={{ background: '#f8fafc', borderRadius: '10px', padding: '0.85rem', border: '1px solid #e2e8f0', margin: '0.9rem 0' }}>
@@ -74,12 +92,15 @@ export default function SelectedCellPanel({ cell, telemetry }) {
       <div className="detail-section">
         <h3>Weather trigger · {liveSource}</h3>
         <div className="detail-metrics two-col">
-          <Metric icon={CloudRain} label="Rainfall 24h" value={display(cell.rainfall_1d_mm, ' mm')} />
+          <Metric icon={CloudRain} label="Prior 24h rainfall" value={display(cell.rainfall_1d_mm, ' mm')} />
           <Metric icon={CloudRain} label="Rainfall 3-day" value={display(cell.rainfall_3d_mm, ' mm')} />
           <Metric icon={CloudRain} label="Rainfall 7-day" value={display(cell.rainfall_7d_mm, ' mm')} />
           <Metric icon={Droplets} label="Soil moisture (VWC)" value={display(cell.soil_moisture_vwc_percent, '%')} />
+          <Metric icon={CloudRain} label="Forecast rainfall 24h" value={display(cell.forecast_rainfall_24h_mm, ' mm')} />
+          <Metric icon={CloudRain} label="Forecast rainfall 48h" value={display(cell.forecast_rainfall_48h_mm, ' mm')} />
+          <Metric icon={CloudRain} label="Forecast rainfall 72h" value={display(cell.forecast_rainfall_72h_mm, ' mm')} />
         </div>
-        <small>Nearest reference location: {cell.telemetry_location || 'Unavailable'}</small>
+        <small>Spatial method: {cell.telemetry_location || 'Unavailable'}. Interpolated model/API data are not native 1 km observations.</small>
       </div>
 
       <div className="detail-section exposure-section">
