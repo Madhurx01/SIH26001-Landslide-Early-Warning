@@ -263,6 +263,7 @@ export default function App() {
         {/* Feature 3: Highway Lifeline Inspector */}
         <RoadRiskPanel
           roads={data.roads}
+          exposureMeta={data.meta.exposure}
           onInspectRoad={(road) => setInspectedRoad(road)}
         />
 
@@ -278,7 +279,7 @@ export default function App() {
 
         <div className="operations-grid">
           {currentUser?.role !== 'viewer' ? (
-            <EmergencyPriorityPanel priorities={data.emergencyPriorities} />
+            <EmergencyPriorityPanel priorities={data.emergencyPriorities} exposureMeta={data.meta.exposure} />
           ) : (
             <section className="panel" style={{ borderLeft: '4px solid #27865f' }}>
               <div className="panel-header">
@@ -286,7 +287,7 @@ export default function App() {
                 <span className="badge" style={{ background: '#27865f', color: '#fff' }}>Public Portal</span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#cad5e2', lineHeight: 1.5 }}>
-                Stay alert along river valleys (Teesta Basin) and steep road cuttings. If traveling on NH-10 or towards North Sikkim (Lachen/Lachung), verify live road clearance status above before departure.
+                Stay alert near mapped HIGH and SEVERE cells and review the GIS road-exposure table before travel. Potential exposure is not confirmation that a road is blocked or officially closed.
               </p>
               <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.06)', padding: '4px 10px', borderRadius: '6px' }}>

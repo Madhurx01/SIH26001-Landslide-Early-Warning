@@ -53,7 +53,7 @@ export default function ReportVerificationPanel({ reports, onStatusChange }) {
       </div>
 
       <p style={{ fontSize: '0.8rem', color: '#cad5e2', margin: '0.35rem 0 1rem 0' }}>
-        Review crowd-sourced ground observations submitted via mobile devices &amp; citizen reporting. Verified reports update the operational risk map and dispatch real-time alerts to Border Roads Organisation (BRO) and SDRF.
+        Review crowd-sourced ground observations submitted via mobile devices. Only verified, geo-tagged reports may boost the GIS review priority; they do not automatically declare a road blocked, trigger evacuation, or dispatch an alert.
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
@@ -101,7 +101,7 @@ export default function ReportVerificationPanel({ reports, onStatusChange }) {
                 <div>
                   {isVerified && (
                     <span style={{ fontSize: '0.75rem', color: '#74e0b1', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(39, 134, 95, 0.25)', padding: '3px 8px', borderRadius: '4px' }}>
-                      <CheckCircle2 size={15} /> Verified by SDMA (Alert Broadcasted)
+                      <CheckCircle2 size={15} /> Verified by administrator · priority context
                     </span>
                   )}
                   {isDismissed && (
@@ -139,7 +139,7 @@ export default function ReportVerificationPanel({ reports, onStatusChange }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                 <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600 }}>
                   <AlertTriangle size={13} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                  Traffic Impact: <strong>{report.roadBlocked}</strong>
+                  Reporter-stated traffic impact: <strong>{report.roadBlocked}</strong>{isPending && ' · unverified'}
                 </span>
 
                 {isPending && (
@@ -176,7 +176,7 @@ export default function ReportVerificationPanel({ reports, onStatusChange }) {
                         gap: '5px'
                       }}
                     >
-                      <CheckCircle2 size={14} /> Verify &amp; Alert BRO
+                      <CheckCircle2 size={14} /> Verify report
                     </button>
                   </div>
                 )}

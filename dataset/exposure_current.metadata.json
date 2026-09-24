@@ -1,0 +1,60 @@
+{
+  "version": "gis-exposure-v1",
+  "generated_at_utc": "2026-09-24T08:00:00+00:00",
+  "source": "Processed OpenStreetMap roads and settlements clipped to Sikkim",
+  "source_files": {
+    "roads": {
+      "path": "DATA/PROCESSED/STATIC/OSM/sikkim_roads.gpkg",
+      "sha256": "737dfaf47b02b842b7ca5cdd778e517dabf3bafc3b9ce415042b7709bd912ddd"
+    },
+    "settlements": {
+      "path": "DATA/PROCESSED/STATIC/OSM/sikkim_settlements.gpkg",
+      "sha256": "9612d6ebf1329dc9ac9a0a5cb64a03c7b8dfe08e2b6ef6a11a38970d1ca4df6d"
+    },
+    "canonical_grid": {
+      "path": "DATA/PROCESSED/GRID/sikkim_grid_1km.gpkg",
+      "sha256": "f36bd72dec6183f9b87ac0e167def0c6e3911d25bac0265a2a231334eade39b4"
+    },
+    "verified_report_input": {
+      "path": "FRONTEND/src/data/pooledReportsDb.json",
+      "sha256": "74ef2ca1bbf09051b52f1f921ea9d1bc39dfba7f3ae27e3614e0683dcbbc0fdd"
+    }
+  },
+  "crs": "EPSG:32645",
+  "road_feature_count": 8879,
+  "road_entity_count": 8385,
+  "dashboard_road_entity_count": 291,
+  "dashboard_road_selection": "All entities carrying an actual OSM name/ref plus the 200 highest-ranked exposed unnamed OSM entities; the segment-level CSV retains all road features",
+  "settlement_feature_count": 141,
+  "road_features_exposed_current": 2713,
+  "road_entities_exposed_current": 2509,
+  "settlements_exposed_current": 25,
+  "road_intersection_method": "Exact LineString/MultiLineString intersection with canonical 1 km cell polygons in EPSG:32645; exposed length is intersection length",
+  "settlement_assignment_method": "Containing canonical cell; deterministic cell_id tie-break on boundaries; nearest cell only if no containing cell",
+  "road_grouping_method": "Group segments only by actual OSM ref/name tags; unnamed features retain individual OSM identity",
+  "road_status_rules": {
+    "CRITICAL": "At least one current SEVERE cell intersects the road entity",
+    "HIGH RISK": "At least one current HIGH cell and no current SEVERE cell intersects the road entity",
+    "WATCH": "No current HIGH/SEVERE intersection, but at least one 24h/48h/72h forecast HIGH/SEVERE intersection",
+    "NORMAL": "No current or 24h/48h/72h HIGH/SEVERE intersection"
+  },
+  "priority_rules": {
+    "P1": "Current SEVERE cell with road or settlement exposure, or a verified geo-tagged report in a current HIGH/SEVERE cell",
+    "P2": "Current HIGH cell with road or settlement exposure",
+    "P3": "Current SEVERE cell without mapped road or settlement exposure"
+  },
+  "priority_counts": {
+    "P1": 10,
+    "P2": 380,
+    "P3": 0
+  },
+  "verified_report_count": 0,
+  "verified_report_mapped_count": 0,
+  "verified_report_priority_boost_count": 0,
+  "semantics": "Potential exposure and review priority only; not confirmed blockage, affected population, evacuation order, or guaranteed impact",
+  "artifact_sha256": {
+    "road_exposure_current.csv": "14f3ace8b438f23dc092dfe3db84aa7e38767d4cd4ad34dba8c9350b46d26545",
+    "settlement_exposure_current.csv": "8521263991e325f1a48b9378f9fd2a59a36d61a037eaec7235373e09d8a76897",
+    "emergency_priorities_current.csv": "98615da377f0c9604f54cf771a489e3cc0e9b48efacfdc1ca341f328e7ae1813"
+  }
+}

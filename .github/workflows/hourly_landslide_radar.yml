@@ -24,7 +24,7 @@ jobs:
 
       - name: Install updater dependencies
         run: |
-          pip install numpy pandas
+          pip install numpy pandas geopandas pyogrio
 
       - name: Update prototype index from Open-Meteo model/API data
         run: |
@@ -47,7 +47,11 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add FRONTEND/src/data/realRiskData.json FRONTEND/src/data/mockRiskData.js
+          git add FRONTEND/src/data/realRiskData.json FRONTEND/src/data/mockRiskData.js \
+            dataset/road_exposure_current.csv \
+            dataset/settlement_exposure_current.csv \
+            dataset/emergency_priorities_current.csv \
+            dataset/exposure_current.metadata.json
           if git diff --staged --quiet; then
             echo "No changes in risk levels this hour."
           else

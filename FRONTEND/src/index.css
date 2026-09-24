@@ -190,6 +190,10 @@ td:first-child small { color: #92a0a3; font-size: 8px; }
 .road-status--open { color: #27714f; background: #e1f3e9; }
 .road-status--caution { color: #936008; background: #fff1ce; }
 .road-status--movement-at-risk, .road-status--potential-blockage { color: #a12a33; background: #ffe5e7; }
+.road-status--normal { color: #27714f; background: #e1f3e9; }
+.road-status--watch { color: #936008; background: #fff1ce; }
+.road-status--high-risk { color: #a45109; background: #ffead8; }
+.road-status--critical { color: #a12a33; background: #ffe5e7; }
 
 .operations-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; }
 .priority-panel { overflow: hidden; }

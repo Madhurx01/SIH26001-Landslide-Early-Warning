@@ -609,13 +609,21 @@ def migrate_timeline_snapshots(master: dict[str, Any], inputs: pd.DataFrame) -> 
         }
 
 
-def data_sources(telemetry: dict[str, Any]) -> list[dict[str, str]]:
+def data_sources(telemetry: dict[str, Any], exposure: dict[str, Any]) -> list[dict[str, str]]:
     weather_status = (f"Fresh at {telemetry['fetch_timestamp_utc']} · {telemetry['successful_location_count']} spatial source points" if telemetry["state"] == "fresh" else "Explicit simulation/demo values; not observations")
     return [
         {"source": "Static susceptibility score", "status": "Existing 7,390-cell uncalibrated model output; not probability", "type": "available"},
         {"source": "Open-Meteo Forecast API precipitation and soil moisture", "status": weather_status, "type": "available" if telemetry["state"] == "fresh" else "demo"},
         {"source": "Sentinel-2 L2A NDVI", "status": "Real satellite NDVI; missing observations remain unavailable", "type": "available"},
         {"source": "GEM active-fault proxy and OpenStreetMap drainage", "status": "Pinned/provenance-validated static distance features", "type": "available"},
+        {
+            "source": "OpenStreetMap roads and settlements",
+            "status": (
+                f"Exact GIS overlay · {exposure['road_feature_count']:,} road features and "
+                f"{exposure['settlement_feature_count']:,} settlements processed"
+            ),
+            "type": "available",
+        },
         {"source": "NASA rainfall / soil-moisture products", "status": "Not connected in this prototype; future adapters planned", "type": "pending"},
     ]
 
@@ -681,6 +689,11 @@ def run_hourly_update(mode: str = "live", output_dir: str | Path | None = None, 
     })
     weather = interpolate_weather(inputs, points)
     layer = build_operational_layer(inputs, weather)
+    from exposure_engine import build_gis_exposure, write_exposure_artifacts
+
+    exposure_payload, exposure_artifacts = build_gis_exposure(
+        repo_root, layer, telemetry["fetch_timestamp_utc"]
+    )
     cells = update_cells(master.get("riskCells", []), layer, telemetry["state"], len(points))
     display_ids = [str(cell["cell_id"]) for cell in cells]
     qa = build_run_qa(layer, display_ids)
@@ -688,7 +701,11 @@ def run_hourly_update(mode: str = "live", output_dir: str | Path | None = None, 
     counts = qa["category_counts"]
     master["riskCells"] = cells
     master["weather"] = weather_summary(layer, points, telemetry)
-    master["dataSources"] = data_sources(telemetry)
+    master["roads"] = exposure_payload["roads"]
+    master["settlements"] = exposure_payload["settlements"]
+    master["emergencyPriorities"] = exposure_payload["emergencyPriorities"]
+    master["alerts"] = exposure_payload["alerts"]
+    master["dataSources"] = data_sources(telemetry, exposure_payload["metadata"])
     meta = master.setdefault("meta", {})
     meta.update({
         "system_status": "Operational Risk Index prototype · monitoring",
@@ -699,6 +716,7 @@ def run_hourly_update(mode: str = "live", output_dir: str | Path | None = None, 
         "index_thresholds": INDEX_THRESHOLDS,
         "forecast_semantics": "24h/48h/72h values are forecast-based risk indices, not observed events or guaranteed predictions",
         "telemetry": telemetry,
+        "exposure": exposure_payload["metadata"],
         "input_validation": {
             "canonical_cell_count": EXPECTED_CELL_COUNT, "ordered_one_to_one_static_join": True,
             "interpolated_cell_count": qa["canonical_cells_interpolated"],
@@ -709,12 +727,14 @@ def run_hourly_update(mode: str = "live", output_dir: str | Path | None = None, 
         },
         "summary": {
             "severe_risk_cells": counts["SEVERE"], "high_risk_cells": counts["HIGH"],
-            "roads_at_risk": None, "settlements_at_risk": None,
-            "exposure_status": "unavailable; no live spatial exposure calculation",
+            "roads_at_risk": exposure_payload["summary"]["roads_at_risk"],
+            "settlements_at_risk": exposure_payload["summary"]["settlements_at_risk"],
+            "exposure_status": exposure_payload["summary"]["exposure_status"],
             "weather_trigger": f"{telemetry['source']} · median interpolated 1-day rain {master['weather']['rainfall_1d_mm']:.1f} mm · soil moisture {master['weather']['soil_moisture_vwc_percent']:.1f}% VWC",
         },
         "run_qa": qa,
     })
+    write_exposure_artifacts(repo_root, exposure_artifacts, exposure_payload["metadata"])
     atomic_write_json(output, master)
     print(
         "Interpolated {canonical:,} canonical cells and updated {cells:,} dashboard cells atomically in {seconds:.2f}s · index {minimum:.1f}/{median:.1f}/{maximum:.1f} · "
@@ -722,6 +742,19 @@ def run_hourly_update(mode: str = "live", output_dir: str | Path | None = None, 
             canonical=qa["canonical_cells_interpolated"], cells=qa["dashboard_cells_updated"], seconds=time.time() - start,
             minimum=qa["operational_risk_index"]["min"], median=qa["operational_risk_index"]["median"], maximum=qa["operational_risk_index"]["max"],
             low=counts["LOW"], moderate=counts["MODERATE"], high=counts["HIGH"], severe=counts["SEVERE"],
+        )
+    )
+    print(
+        "GIS exposure · {road_features:,} OSM road features · {settlements:,} settlements · "
+        "{road_entities:,} exposed road entities · {settlement_exposure:,} exposed settlements · "
+        "P1 {p1:,}, P2 {p2:,}, P3 {p3:,}".format(
+            road_features=exposure_payload["metadata"]["road_feature_count"],
+            settlements=exposure_payload["metadata"]["settlement_feature_count"],
+            road_entities=exposure_payload["metadata"]["road_entities_exposed_current"],
+            settlement_exposure=exposure_payload["metadata"]["settlements_exposed_current"],
+            p1=exposure_payload["metadata"]["priority_counts"]["P1"],
+            p2=exposure_payload["metadata"]["priority_counts"]["P2"],
+            p3=exposure_payload["metadata"]["priority_counts"]["P3"],
         )
     )
     return True
