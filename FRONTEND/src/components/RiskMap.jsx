@@ -94,13 +94,13 @@ export default function RiskMap({ riskCells, roads, settlements, historicalLands
             )
           })}
           {layers.roads && roads.map((road) => (
-            <Polyline key={road.road_id} positions={road.coordinates} pathOptions={{ color: road.risk_level === 'SEVERE' ? '#b6232d' : '#304a54', weight: 4, opacity: 0.88, dashArray: road.risk_level === 'MODERATE' ? '7 6' : undefined }}>
-              <Tooltip sticky><RouteIcon size={12} /> {road.road_name} · {road.status}</Tooltip>
+            <Polyline key={road.road_id} positions={road.coordinates} pathOptions={{ color: road.status === 'CRITICAL' ? '#b6232d' : road.status === 'HIGH RISK' ? '#e16713' : road.status === 'WATCH' ? '#b87808' : '#304a54', weight: 4, opacity: 0.88, dashArray: road.status === 'WATCH' ? '7 6' : undefined }}>
+              <Tooltip sticky><RouteIcon size={12} /> {road.road_name} · {road.status}<br />Potentially exposed: {road.current_exposure?.exposed_cell_count ?? 0} cells / {road.affected_segment_km} km</Tooltip>
             </Polyline>
           ))}
           {layers.settlements && settlements.map((settlement) => (
-            <CircleMarker key={settlement.settlement_id} center={[settlement.latitude, settlement.longitude]} radius={6} pathOptions={{ color: '#fff', weight: 2, fillColor: '#174f8a', fillOpacity: 1 }}>
-              <Tooltip direction="right"><MapPin size={12} /> {settlement.name}<br />Potential exposure: {settlement.population_exposure}</Tooltip>
+            <CircleMarker key={settlement.settlement_id} center={[settlement.latitude, settlement.longitude]} radius={6} pathOptions={{ color: '#fff', weight: 2, fillColor: settlement.risk_level === 'SEVERE' ? '#b6232d' : settlement.risk_level === 'HIGH' ? '#e16713' : '#174f8a', fillOpacity: 1 }}>
+              <Tooltip direction="right"><MapPin size={12} /> {settlement.name} · {settlement.settlement_type}<br />Current: {settlement.operational_risk_index} {settlement.risk_level}<br />Forecast 24/48/72h: {settlement.operational_risk_index_24h} / {settlement.operational_risk_index_48h} / {settlement.operational_risk_index_72h}</Tooltip>
             </CircleMarker>
           ))}
           {layers.history && historicalLandslides.map((event) => (
