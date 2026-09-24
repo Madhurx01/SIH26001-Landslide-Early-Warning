@@ -30,7 +30,7 @@ export const PRESET_USERS = {
     badgeColor: '#138b9c',
     permissions: [
       'VIEW_MAP',
-      'INSPECT_SHAP_MODELS',
+      'INSPECT_RISK_FACTORS',
       'MONSOON_TIMELINE_SCRUB',
       'SATELLITE_TELEMETRY_ANALYTICS',
       'EXPORT_REPORTS'

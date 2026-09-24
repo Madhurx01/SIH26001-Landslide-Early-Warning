@@ -16,8 +16,8 @@ export default function SummaryCards({ summary }) {
           <div className="summary-card__icon"><Icon size={20} /></div>
           <div>
             <p>{label}</p>
-            <strong className={key === 'weather_trigger' ? 'is-text' : ''}>{summary[key]}</strong>
-            <span>OPERATIONAL ML</span>
+            <strong className={key === 'weather_trigger' ? 'is-text' : ''}>{summary[key] ?? 'Unavailable'}</strong>
+            <span>PROTOTYPE INDEX</span>
           </div>
         </article>
       ))}

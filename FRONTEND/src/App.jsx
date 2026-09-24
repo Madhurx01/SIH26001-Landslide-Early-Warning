@@ -6,6 +6,7 @@ import SummaryCards from './components/SummaryCards'
 import RiskMap from './components/RiskMap'
 import SelectedCellPanel from './components/SelectedCellPanel'
 import WeatherRiskPanel from './components/WeatherRiskPanel'
+import DataSourceStatus from './components/DataSourceStatus'
 import RoadRiskPanel from './components/RoadRiskPanel'
 import HighwayInspectorModal from './components/HighwayInspectorModal'
 import EmergencyPriorityPanel from './components/EmergencyPriorityPanel'
@@ -111,7 +112,7 @@ export default function App() {
   }
 
   if (!data) {
-    return <main className="loading-screen"><div className="loading-mark"><Gauge size={26} /></div><strong>Preparing risk monitoring console</strong><span>Loading live ML early warning feeds…</span></main>
+    return <main className="loading-screen"><div className="loading-mark"><Gauge size={26} /></div><strong>Preparing risk monitoring console</strong><span>Loading operational index data…</span></main>
   }
 
   // Active snapshot calculation based on mode & timeline selection
@@ -120,9 +121,9 @@ export default function App() {
   const currentMetaSummary = (telemetryMode === 'live') ? data.meta.summary : (currentSnapshot ? {
     severe_risk_cells: currentSnapshot.meta.severe_count,
     high_risk_cells: currentSnapshot.meta.high_count,
-    roads_at_risk: currentSnapshot.meta.severe_count > 500 ? 5 : currentSnapshot.meta.severe_count > 100 ? 3 : 0,
-    settlements_at_risk: currentSnapshot.meta.severe_count > 500 ? 7 : 2,
-    weather_trigger: `NASA IMERG Rain (${currentSnapshot.meta.weather_summary.rainfall_3d} mm 3d) & SMAP Saturation (${currentSnapshot.meta.weather_summary.soil_moisture}%)`
+    roads_at_risk: null,
+    settlements_at_risk: null,
+    weather_trigger: `Simulation: ${currentSnapshot.meta.weather_summary.rainfall_3d_mm} mm 3-day rain & ${currentSnapshot.meta.weather_summary.soil_moisture_vwc_percent}% VWC soil moisture`
   } : data.meta.summary)
 
   return (
@@ -154,10 +155,12 @@ export default function App() {
             <RadioTower size={18} style={{ color: '#26d0ce' }} />
             <div>
               <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>
-                <strong>Operational Early Warning Mode:</strong> Dual-Layer ML System Active (Static Susceptibility &amp; Dynamic Meteorological Trigger).
+                <strong>Operational Risk Index prototype:</strong> static susceptibility combined with a dynamic weather trigger.
               </p>
               <span style={{ fontSize: '0.72rem', color: '#9ec8b9' }}>
-                Mode: {telemetryMode === 'live' ? '🛰️ Real-Time Live Satellite Telemetry Active (Open-Meteo Feed)' : '🚨 Extreme Disaster Storm Simulation (19 Oct)'}
+                Mode: {telemetryMode === 'live'
+                  ? `Open-Meteo model/API data · ${data.meta.telemetry?.state || 'unavailable'}`
+                  : 'Simulation/demo mode · not live telemetry'}
               </span>
             </div>
           </div>
@@ -189,7 +192,7 @@ export default function App() {
                 boxShadow: telemetryMode === 'live' ? '0 2px 8px rgba(0,0,0,0.3)' : 'none'
               }}
             >
-              🛰️ Live Satellite Radar (Today)
+              Live Open-Meteo data
             </button>
             <button
               type="button"
@@ -235,8 +238,7 @@ export default function App() {
             selectedCell={selectedCell}
             onSelectCell={setSelectedCell}
           />
-          {/* Feature 2: Visual SHAP Diverging Factor Bars in Selected Cell Panel */}
-          <SelectedCellPanel cell={selectedCell} />
+          <SelectedCellPanel cell={selectedCell} telemetry={data.meta.telemetry} />
         </div>
 
         <div className="analysis-grid">
@@ -253,6 +255,8 @@ export default function App() {
             }}
           />
         </div>
+
+        <DataSourceStatus sources={data.dataSources || []} />
 
         {/* Feature 3: Highway Lifeline Inspector */}
         <RoadRiskPanel
@@ -318,7 +322,7 @@ export default function App() {
 
       <footer>
         <strong>SIH26001 · AAPTIRAKSHAK · Sikkim Pilot</strong>
-        <p>Decision-support early warning system powered by Dual-Layer Machine Learning (Static Susceptibility &amp; Dynamic Meteorological Radar).</p>
+        <p>Prototype decision-support index combining static susceptibility with Open-Meteo model/API weather triggers. Not a calibrated probability.</p>
         <span style={{ background: '#138b9c', color: '#fff' }}>
           SESSION: {currentUser?.role?.toUpperCase()} ({currentUser?.name})
         </span>

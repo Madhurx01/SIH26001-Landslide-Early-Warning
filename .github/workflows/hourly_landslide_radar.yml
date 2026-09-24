@@ -1,4 +1,4 @@
-name: 🛰️ Automated Hourly Landslide ML Radar Pipeline
+name: Automated Hourly Operational Risk Index Update
 
 on:
   schedule:
@@ -22,11 +22,11 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: 📦 Install ML Dependencies
+      - name: Install updater dependencies
         run: |
-          pip install numpy pandas xgboost
+          pip install numpy pandas
 
-      - name: ⚡ Execute Automated Layer 2 ML Worker (< 50ms Inference)
+      - name: Update prototype index from Open-Meteo model/API data
         run: |
           python SCRIPTS/12_hourly_cloud_updater.py --mode live
 
@@ -43,7 +43,7 @@ jobs:
           npm ci
           npm run build
 
-      - name: 💾 Commit & Push Live Updated State Telemetry
+      - name: Commit validated operational index state
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -51,6 +51,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in risk levels this hour."
           else
-            git commit -m "chore(telemetry): auto-sync hourly satellite ML early warning state [skip ci]"
+            git commit -m "chore(telemetry): sync Open-Meteo operational index [skip ci]"
             git push
           fi

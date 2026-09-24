@@ -37,7 +37,7 @@ export default function RiskMap({ riskCells, roads, settlements, historicalLands
         <div>
           <span className="section-eyebrow"><LocateFixed size={14} /> GIS RISK VISUALIZATION</span>
           <h2>Sikkim Landslide Risk Map</h2>
-          <p>Predicted risk, exposed routes and settlements · 1-km ML grid</p>
+          <p>Prototype Operational Risk Index with static context · 1-km analysis grid</p>
         </div>
         <button className="layer-button" type="button" onClick={() => setLayersOpen(!layersOpen)} aria-expanded={layersOpen}>
           <Layers3 size={17} /> Layers <span>{Object.values(layers).filter(Boolean).length}/5</span>
@@ -80,13 +80,13 @@ export default function RiskMap({ riskCells, roads, settlements, historicalLands
                 pathOptions={{ color: isSelected ? '#102f38' : config.color, fillColor: config.color, fillOpacity: isSelected ? 0.72 : 0.48, weight: isSelected ? 3 : 2 }}
                 eventHandlers={{ click: () => onSelectCell(cell) }}
               >
-                <Tooltip direction="top" offset={[0, -8]}><strong>{cell.cell_id}</strong> · {cell.risk_probability}% {cell.risk_level}</Tooltip>
+                <Tooltip direction="top" offset={[0, -8]}><strong>{cell.cell_id}</strong> · index {cell.operational_risk_index} {cell.risk_level}</Tooltip>
                 <Popup>
                   <div className="map-popup">
-                    <span>ML PREDICTION CELL</span>
+                    <span>OPERATIONAL INDEX CELL</span>
                     <strong>{cell.cell_id}</strong>
                     <SeverityBadge level={cell.risk_level} />
-                    <p><b>{cell.risk_probability}%</b> predicted risk probability</p>
+                    <p><b>{cell.operational_risk_index}/100</b> prototype decision-support index</p>
                     <button type="button" onClick={() => onSelectCell(cell)}>View assessment</button>
                   </div>
                 </Popup>
@@ -110,7 +110,7 @@ export default function RiskMap({ riskCells, roads, settlements, historicalLands
           ))}
         </MapContainer>
         <RiskLegend />
-        <div className="map-demo-note">OPERATIONAL ML PREDICTION LAYERS (1-KM SIKKIM GRID)</div>
+        <div className="map-demo-note">PROTOTYPE OPERATIONAL RISK INDEX · NOT A CALIBRATED PROBABILITY</div>
       </div>
     </section>
   )
