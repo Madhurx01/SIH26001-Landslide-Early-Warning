@@ -118,6 +118,8 @@ export default function App() {
   // Active snapshot calculation based on mode & timeline selection
   const currentSnapshot = (data.timelineSnapshots && data.timelineSnapshots[selectedDate]) || null
   const currentRiskCells = (telemetryMode === 'live') ? data.riskCells : (currentSnapshot ? currentSnapshot.riskCells : data.riskCells)
+  const currentWeather = (telemetryMode === 'live') ? data.weather : (currentSnapshot?.weather || data.weather)
+  const currentTelemetry = (telemetryMode === 'live') ? data.meta.telemetry : { state: 'simulation' }
   const currentMetaSummary = (telemetryMode === 'live') ? data.meta.summary : (currentSnapshot ? {
     severe_risk_cells: currentSnapshot.meta.severe_count,
     high_risk_cells: currentSnapshot.meta.high_count,
@@ -238,11 +240,11 @@ export default function App() {
             selectedCell={selectedCell}
             onSelectCell={setSelectedCell}
           />
-          <SelectedCellPanel cell={selectedCell} telemetry={data.meta.telemetry} />
+          <SelectedCellPanel cell={selectedCell} telemetry={currentTelemetry} />
         </div>
 
         <div className="analysis-grid">
-          <WeatherRiskPanel weather={data.weather} />
+          <WeatherRiskPanel weather={currentWeather} />
           <AlertsPanel
             alerts={data.alerts}
             acknowledged={acknowledged}

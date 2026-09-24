@@ -1,41 +1,120 @@
 # Dynamic Early-Warning Pipeline
 
-## Current scope
+## Scope and interpretation
 
-The live layer is an **Operational Risk Index prototype** for decision support. It
-combines the existing per-cell static susceptibility score with recent
-precipitation and shallow soil-moisture triggers. The 0–100 result is not a
-calibrated probability of landslide occurrence and must not be used as a sole
-basis for evacuation, road closure, or emergency dispatch.
+The live layer is a transparent **Operational Risk Index prototype** for
+decision support. It combines the existing per-cell static susceptibility with
+a spatially varying Dynamic Trigger Index derived from operational weather
+model/API data. Neither index is a calibrated probability of landslide
+occurrence. A forecast index is not an observed event or a guaranteed
+prediction, and this layer must not be the sole basis for evacuation, road
+closure, or emergency dispatch.
 
-The current operational weather adapter is the public Open-Meteo Forecast API.
-It obtains model/API precipitation and model-derived 0–7 cm volumetric soil
-moisture at Gangtok, Mangan, Namchi, and Gyalshing. These values are **not NASA
-IMERG rainfall and not NASA SMAP soil moisture**. They are point samples, not a
-spatially complete observation grid; each displayed analysis cell currently
-uses its nearest reference location.
+Open-Meteo Forecast API is the current prototype weather source. Its
+precipitation and model-derived 0–7 cm volumetric soil moisture are **not NASA
+IMERG rainfall and not NASA SMAP soil moisture**. Future production adapters
+are described below.
 
-## Inputs and index
+## Spatial weather sampling and interpolation
 
-Static inputs are joined one-to-one on the canonical ordered `cell_id` contract:
+For each run, the updater derives the geographic extent from the 7,390 ordered
+canonical cell centroids and constructs a deterministic rectangular sampling
+lattice. With the present grid extent this is 6 rows by 5 columns, or 30
+Open-Meteo query points. The requested maximum spacing is 0.25 degrees; the
+current fitted spacing is about 23.0 km north–south and 22.3 km east–west.
+Coordinates, bounds, shape, requested and fitted spacing, and successful and
+failed point counts are written to output metadata.
+
+Every weather variable is interpolated to all canonical 1 km cell centroids by
+four-neighbour inverse-distance weighting (IDW) with power 2. Distances use a
+local equirectangular kilometre approximation at Sikkim's mean latitude. Exact
+source-point coincidences are stabilized with a very small positive distance.
+The same neighbour selection and weights are applied independently to each
+variable. This produces a reproducible spatial weather layer, but it does
+**not** make the weather data native 1 km observations or resolve mountain
+microclimates at 1 km.
+
+The updater validates the complete 30-point response before interpolation. It
+does not substitute a statewide mean or fabricate missing values.
+
+## Weather windows
+
+Open-Meteo is requested with seven past days and four forecast days at hourly
+resolution. At each source point the updater validates timestamps, array
+lengths, finite non-negative precipitation, and soil moisture in the physical
+range 0–1 m³/m³, then derives:
+
+- prior/current 24-hour precipitation (`rainfall_1d_mm`);
+- antecedent 48-, 72-, 96-, and 168-hour precipitation, of which the 3-day and
+  7-day totals are displayed;
+- current 0–7 cm volumetric soil moisture;
+- cumulative forecast precipitation through +24, +48, and +72 hours; and
+- forecast 0–7 cm soil moisture at +24, +48, and +72 hours.
+
+The current index includes the next-24-hour rainfall forecast as a near-term
+trigger. Forecast indices project the rolling windows at +24, +48, and +72
+hours by adding forecast precipitation and removing elapsed antecedent
+precipitation where the available windows permit it. They use forecast soil
+moisture at the corresponding horizon.
+
+## Static inputs
+
+Static inputs are joined one-to-one on the canonical ordered `cell_id`
+contract:
 
 - the existing 7,390-cell uncalibrated static susceptibility output;
 - SRTM-derived slope/elevation and OSM road/settlement proximity;
 - provenance-validated GEM active-fault proxy and OSM drainage distances; and
 - Sentinel-2 L2A NDVI, preserving unavailable (`NaN`) observations.
 
-The dynamic trigger is a transparent heuristic combination of capped terms:
+Duplicate, missing, reordered, or unexpected canonical IDs fail the update.
+NDVI remains unavailable when no valid satellite observation exists and is
+omitted from the corresponding factor explanation.
 
-- 45%: 24-hour precipitation relative to 100 mm;
-- 30%: 3-day precipitation relative to 200 mm;
-- 10%: 7-day precipitation relative to 350 mm; and
-- 15%: 0–7 cm volumetric soil moisture scaled between 0.15 and 0.45 m³/m³.
+## Dynamic Trigger Index
 
-The index retains the static susceptibility baseline and allows the trigger to
-raise the remaining distance to 100 by at most 55%. These design weights are
-prototype decision rules, not learned coefficients and not SHAP values.
+Dynamic Trigger Index version `dti-v2-spatial-forecast` is a documented
+prototype rule, not a fitted model and not SHAP or learned feature importance.
+For each cell and horizon, each component is clipped to 0–1:
 
-Categories are:
+```text
+R1 = rainfall_1d / 100 mm
+R3 = rainfall_3d / 200 mm
+R7 = rainfall_7d / 350 mm
+SM = (soil_moisture - 0.15) / 0.30 m³/m³
+F  = cumulative forecast rainfall / horizon threshold
+
+Dynamic Trigger Index = 100 × (
+    0.35 × R1 +
+    0.25 × R3 +
+    0.10 × R7 +
+    0.20 × SM +
+    0.10 × F
+)
+```
+
+The forecast rainfall thresholds are 100 mm at current/+24 h, 160 mm at +48
+h, and 220 mm at +72 h. The precipitation thresholds represent conservative
+prototype intensity/accumulation scales selected for transparent screening;
+they have not been calibrated against a Sikkim landslide-event catalogue.
+Recent rainfall receives the greatest weight, followed by the three-day
+accumulation and soil wetness; seven-day and forward rainfall terms provide
+antecedent and near-future context.
+
+## Operational Risk Index and categories
+
+Operational Risk Index version `ori-v2-65-static-35-trigger` is:
+
+```text
+Operational Risk Index =
+    0.65 × static susceptibility + 0.35 × Dynamic Trigger Index
+```
+
+Both inputs and the result use a 0–100 scale. Static susceptibility preserves
+the spatial baseline while weather can raise or lower the operational index.
+The same formula is applied to current, +24 h, +48 h, and +72 h triggers.
+
+The fixed screening categories are:
 
 | Category | Operational Risk Index |
 |---|---:|
@@ -44,40 +123,48 @@ Categories are:
 | HIGH | 50 to less than 75 |
 | SEVERE | 75 to 100 |
 
-The dashboard's `risk_factors` list reports contextual input values only. It
-does not claim causal attribution, feature importance, or geological conditions
-such as bedrock stability or shear stress.
+These thresholds are operational prototype bands, not probability cutoffs.
+They are fixed in code and are not adjusted per run to force class coverage.
+The dashboard's `risk_factors` are contextual inputs only and do not claim
+causal attribution or unsupported geology such as bedrock stability or shear
+stress.
 
-## Telemetry validation and freshness
+## Provenance, freshness, and fail-closed behavior
 
-Live mode requests a complete rolling 168-hour history from all four reference
-locations. It validates array lengths, timestamps, finite/non-negative rainfall,
-physical soil-moisture bounds, and a maximum age of three hours. Output metadata
-records the source, fetch attempt and source timestamps, freshness, successful
-and failed locations, missing-data state, and the last trusted fetch time.
+Output metadata records source and fetch timestamps, freshness, every source
+coordinate, point counts and failures, sampling-grid geometry, interpolation
+method and parameters, missing-data state, and both formula/version strings.
+The current maximum source age is three hours.
 
-If any location fails or returns incomplete, invalid, stale, or future-dated
-data, the updater fails closed. It inserts no default rainfall or soil moisture,
-does not recompute the index, preserves the last trusted cell/weather values,
-marks telemetry unavailable/stale, and writes the status atomically. Static
-input duplication, misalignment, checksum failure, or missing required fault
-distances also aborts the update before output replacement.
+If any source point fails or returns incomplete, invalid, stale, or
+future-dated data, the live updater fails closed. It does not recompute any
+index, insert default weather, or partially accept the spatial field. The last
+trusted cell/weather values remain in place and metadata marks telemetry
+unavailable/stale with the failed fetch details. Static provenance/checksum
+failure, duplicate IDs, misalignment, or missing required fault distances also
+aborts before output replacement.
 
-All successful and failed-status JSON replacements use a same-directory
-temporary file followed by an atomic replace, preventing a partial dashboard
-file. Road and settlement exposure counts remain unavailable until a real
-spatial exposure calculation is connected.
+Successful and failed-status writes use a same-directory temporary file and
+atomic replace. Road and settlement exposure counts remain unavailable until
+a real spatial exposure calculation is connected.
 
 ## Demonstration modes and limitations
 
-`--mode storm`, `--mode dry`, and the historical timeline are explicitly
-labelled simulations. Their weather values are scenario assumptions and never
-share live provenance. Open-Meteo itself remains a temporary prototype source:
-mountain microclimates, gauge bias, model resolution, snow processes, and local
-soil properties are not resolved by four reference points.
+`--mode storm`, `--mode dry`, and historical timeline snapshots are explicitly
+labelled simulations. Their uniform weather assumptions never share live
+provenance.
 
-Planned production adapters should ingest independently quality-controlled IMD
-rain-gauge or gridded rainfall, NASA GPM IMERG precipitation, and NASA SMAP or
-another validated soil-moisture product. Each adapter must retain native
-product identity, resolution, timestamps, quality flags, missing values, and
-provenance rather than relabelling or filling absent observations.
+Open-Meteo is a temporary operational prototype source. Its underlying model
+grid, terrain representation, update cycle, and forecast uncertainty are not
+equivalent to rain gauges or in-situ soil sensors. IDW smooths between sparse
+samples and cannot reproduce orographic gradients, convective cells, snowmelt,
+sub-grid drainage, soil depth, or localized saturation. Forecast uncertainty
+generally increases from 24 to 72 hours. The formulas and thresholds require
+validation against independent observations and a landslide-event catalogue
+before operational safety use.
+
+Planned adapters should ingest independently quality-controlled IMD rain-gauge
+or gridded rainfall, NASA GPM IMERG precipitation, and NASA SMAP or another
+validated soil-moisture product. Each adapter must preserve native product
+identity, resolution, timestamps, quality flags, uncertainty, missing values,
+and provenance rather than relabelling or filling absent observations.
