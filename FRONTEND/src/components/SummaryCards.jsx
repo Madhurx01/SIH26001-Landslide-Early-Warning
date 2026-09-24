@@ -3,7 +3,7 @@ import { AlertTriangle, CloudRain, Home, Route, ShieldAlert } from 'lucide-react
 const cardConfig = [
   { key: 'severe_risk_cells', label: 'Severe risk cells', icon: ShieldAlert, tone: 'severe' },
   { key: 'high_risk_cells', label: 'High risk cells', icon: AlertTriangle, tone: 'high' },
-  { key: 'roads_at_risk', label: 'Roads at risk', icon: Route, tone: 'roads' },
+  { key: 'roads_at_risk', label: 'Exposed road entities', icon: Route, tone: 'roads' },
   { key: 'settlements_at_risk', label: 'Settlements at risk', icon: Home, tone: 'settlements' },
   { key: 'weather_trigger', label: 'Current weather trigger', icon: CloudRain, tone: 'weather' },
 ]
