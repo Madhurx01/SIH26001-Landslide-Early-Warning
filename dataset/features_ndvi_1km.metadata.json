@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "data_origin": "satellite_observation",
+  "synthetic_fallback_used": false,
+  "generated_at_utc": "2026-09-23T18:53:49.769938+00:00",
+  "output_csv": "D:\\SIH26001\\dataset\\features_ndvi_1km.csv",
+  "output_sha256": "17a455bd071ee63a8032bc7271db601dd627c4e2d5a1159893a5adf5e962460c",
+  "output_columns": [
+    "cell_id",
+    "ndvi_mean"
+  ],
+  "canonical_grid": "D:\\SIH26001\\DATA\\PROCESSED\\GRID\\sikkim_grid_1km.gpkg",
+  "boundary": "D:\\SIH26001\\DATA\\PROCESSED\\STATIC\\BOUNDARY\\sikkim_boundary_utm45n.gpkg",
+  "static_alignment_reference": "D:\\SIH26001\\DATA\\PROCESSED\\FEATURES\\sikkim_static_features_1km.csv",
+  "row_count": 7390,
+  "source": {
+    "provider": "Microsoft Planetary Computer public STAC API",
+    "stac_url": "https://planetarycomputer.microsoft.com/api/stac/v1",
+    "collection": "sentinel-2-l2a",
+    "satellite_product": "Copernicus Sentinel-2 MSI Level-2A surface reflectance",
+    "red_asset": "B04 (10 m native pixel spacing)",
+    "nir_asset": "B08 (10 m native pixel spacing)",
+    "quality_asset": "SCL (20 m native pixel spacing)",
+    "credentials_required": false
+  },
+  "temporal_period": {
+    "start_date_inclusive": "2021-10-01",
+    "end_date_inclusive": "2021-11-30",
+    "acquisition_timestamp_count": 15,
+    "acquisition_timestamps": [
+      "2021-10-04T04:47:01.024000Z",
+      "2021-10-06T04:36:59.024000Z",
+      "2021-10-09T04:47:09.024000Z",
+      "2021-10-11T04:37:21.024000Z",
+      "2021-10-14T04:47:51.024000Z",
+      "2021-11-05T04:39:49.024000Z",
+      "2021-11-08T04:50:09.024000Z",
+      "2021-11-10T04:40:21.024000Z",
+      "2021-11-13T04:50:41.024000Z",
+      "2021-11-15T04:40:39.024000Z",
+      "2021-11-18T04:50:59.024000Z",
+      "2021-11-20T04:41:01.024000Z",
+      "2021-11-25T04:41:19.024000Z",
+      "2021-11-28T04:51:29.024000Z",
+      "2021-11-30T04:41:41.024000Z"
+    ]
+  },
+  "quality_filtering": {
+    "maximum_catalog_cloud_cover_percent": 30.0,
+    "retained_scl_classes": {
+      "4": "vegetation",
+      "5": "not_vegetated",
+      "6": "water",
+      "7": "unclassified"
+    },
+    "excluded_scl_classes": [
+      0,
+      1,
+      2,
+      3,
+      8,
+      9,
+      10,
+      11
+    ],
+    "scl_resampling": "nearest neighbour from native 20 m to B04/B08 10 m grid",
+    "minimum_valid_fraction_per_cell_acquisition": 0.2,
+    "nodata_handling": "DN=0/nodata, invalid denominator, and non-finite values excluded",
+    "radiometry": "STAC scale/offset when supplied; otherwise PB >=04.00 uses scale 0.0001 and BOA offset -0.1, older PB uses zero offset"
+  },
+  "aggregation": {
+    "analysis_unit": "unchanged existing 1 km square Sikkim grid",
+    "boundary_handling": "partial cells clipped to Sikkim for pixel aggregation",
+    "spatial_reducer": "mean of valid native 10 m NDVI pixels per acquisition",
+    "overlap_handling": "same-acquisition tile with most valid pixels retained",
+    "temporal_reducer": "median of accepted per-acquisition cell means",
+    "output_name_note": "ndvi_mean retained for downstream compatibility",
+    "native_resolution_claim": "1 km aggregate; not native 1 km satellite data"
+  },
+  "qa": {
+    "catalog_item_count": 31,
+    "items": [
+      {
+        "item_id": "S2A_MSIL2A_20211004T044701_R076_T45RXM_20211004T121709",
+        "datetime": "2021-10-04T04:47:01.024000Z",
+        "mgrs_tile": "45RXM",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 19.663695,
+        "cells_meeting_valid_fraction": 29,
+        "valid_native_pixels": 187628
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211006T043659_R033_T45RXM_20211006T145639",
+        "datetime": "2021-10-06T04:36:59.024000Z",
+        "mgrs_tile": "45RXM",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 10.144898,
+        "cells_meeting_valid_fraction": 503,
+        "valid_native_pixels": 3775786
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211009T044709_R076_T45RXM_20211009T131740",
+        "datetime": "2021-10-09T04:47:09.024000Z",
+        "mgrs_tile": "45RXM",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 9.383675,
+        "cells_meeting_valid_fraction": 50,
+        "valid_native_pixels": 349460
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211011T043721_R033_T45RWL_20211011T150743",
+        "datetime": "2021-10-11T04:37:21.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 27.908471,
+        "cells_meeting_valid_fraction": 214,
+        "valid_native_pixels": 1314665
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211011T043721_R033_T45RXK_20211011T134005",
+        "datetime": "2021-10-11T04:37:21.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 1.255377,
+        "cells_meeting_valid_fraction": 51,
+        "valid_native_pixels": 358330
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211011T043721_R033_T45RXL_20211011T130636",
+        "datetime": "2021-10-11T04:37:21.024000Z",
+        "mgrs_tile": "45RXL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 23.321036,
+        "cells_meeting_valid_fraction": 5288,
+        "valid_native_pixels": 43270349
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211011T043721_R033_T45RXM_20211011T134318",
+        "datetime": "2021-10-11T04:37:21.024000Z",
+        "mgrs_tile": "45RXM",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 10.206838,
+        "cells_meeting_valid_fraction": 615,
+        "valid_native_pixels": 4747560
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211014T044751_R076_T45RWL_20211014T161921",
+        "datetime": "2021-10-14T04:47:51.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 24.016405,
+        "cells_meeting_valid_fraction": 243,
+        "valid_native_pixels": 1791829
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211014T044751_R076_T45RXM_20211014T164528",
+        "datetime": "2021-10-14T04:47:51.024000Z",
+        "mgrs_tile": "45RXM",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 13.696276,
+        "cells_meeting_valid_fraction": 52,
+        "valid_native_pixels": 305970
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211105T043949_R033_T45RXK_20211112T011341",
+        "datetime": "2021-11-05T04:39:49.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 12.778193,
+        "cells_meeting_valid_fraction": 51,
+        "valid_native_pixels": 351808
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211108T045009_R076_T45RWL_20211112T041809",
+        "datetime": "2021-11-08T04:50:09.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 18.747829,
+        "cells_meeting_valid_fraction": 262,
+        "valid_native_pixels": 1926188
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211108T045009_R076_T45RXK_20211112T030609",
+        "datetime": "2021-11-08T04:50:09.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 1.560274,
+        "cells_meeting_valid_fraction": 1,
+        "valid_native_pixels": 459
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211110T044021_R033_T45RWL_20211110T123827",
+        "datetime": "2021-11-10T04:40:21.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 28.213167,
+        "cells_meeting_valid_fraction": 232,
+        "valid_native_pixels": 1822839
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211110T044021_R033_T45RXK_20211110T133358",
+        "datetime": "2021-11-10T04:40:21.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 0.39188,
+        "cells_meeting_valid_fraction": 51,
+        "valid_native_pixels": 357678
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211110T044021_R033_T45RXL_20211110T121253",
+        "datetime": "2021-11-10T04:40:21.024000Z",
+        "mgrs_tile": "45RXL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 26.996659,
+        "cells_meeting_valid_fraction": 4947,
+        "valid_native_pixels": 42219857
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211113T045041_R076_T45RWL_20211113T124058",
+        "datetime": "2021-11-13T04:50:41.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 22.013593,
+        "cells_meeting_valid_fraction": 196,
+        "valid_native_pixels": 1168281
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211113T045041_R076_T45RXK_20211113T123146",
+        "datetime": "2021-11-13T04:50:41.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 17.54722,
+        "cells_meeting_valid_fraction": 2,
+        "valid_native_pixels": 2208
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211115T044039_R033_T45RXK_20211115T113549",
+        "datetime": "2021-11-15T04:40:39.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 1.522066,
+        "cells_meeting_valid_fraction": 51,
+        "valid_native_pixels": 357600
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211118T045059_R076_T45RWL_20230130T012439",
+        "datetime": "2021-11-18T04:50:59.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "04.00",
+        "catalog_cloud_cover_percent": 0.688862,
+        "cells_meeting_valid_fraction": 284,
+        "valid_native_pixels": 2230547
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211118T045059_R076_T45RXK_20211118T160124",
+        "datetime": "2021-11-18T04:50:59.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 0.000117,
+        "cells_meeting_valid_fraction": 1,
+        "valid_native_pixels": 1794
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211118T045059_R076_T45RXL_20211118T175702",
+        "datetime": "2021-11-18T04:50:59.024000Z",
+        "mgrs_tile": "45RXL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 10.927773,
+        "cells_meeting_valid_fraction": 964,
+        "valid_native_pixels": 7685428
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211118T045059_R076_T45RXM_20230130T071155",
+        "datetime": "2021-11-18T04:50:59.024000Z",
+        "mgrs_tile": "45RXM",
+        "processing_baseline": "04.00",
+        "catalog_cloud_cover_percent": 0.041304,
+        "cells_meeting_valid_fraction": 46,
+        "valid_native_pixels": 191180
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211120T044101_R033_T45RWL_20211120T144424",
+        "datetime": "2021-11-20T04:41:01.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 24.941212,
+        "cells_meeting_valid_fraction": 218,
+        "valid_native_pixels": 1381669
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211120T044101_R033_T45RXK_20211120T164431",
+        "datetime": "2021-11-20T04:41:01.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 2.855482,
+        "cells_meeting_valid_fraction": 51,
+        "valid_native_pixels": 353611
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211120T044101_R033_T45RXL_20211120T162445",
+        "datetime": "2021-11-20T04:41:01.024000Z",
+        "mgrs_tile": "45RXL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 29.811724,
+        "cells_meeting_valid_fraction": 3825,
+        "valid_native_pixels": 26277419
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211120T044101_R033_T45RXM_20211120T144633",
+        "datetime": "2021-11-20T04:41:01.024000Z",
+        "mgrs_tile": "45RXM",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 6.212056,
+        "cells_meeting_valid_fraction": 338,
+        "valid_native_pixels": 1799522
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211125T044119_R033_T45RXK_20211125T174525",
+        "datetime": "2021-11-25T04:41:19.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 4.872406,
+        "cells_meeting_valid_fraction": 51,
+        "valid_native_pixels": 343413
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211128T045129_R076_T45RWL_20211129T024733",
+        "datetime": "2021-11-28T04:51:29.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 27.118175,
+        "cells_meeting_valid_fraction": 182,
+        "valid_native_pixels": 1112785
+      },
+      {
+        "item_id": "S2B_MSIL2A_20211128T045129_R076_T45RXK_20211129T024611",
+        "datetime": "2021-11-28T04:51:29.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 9.406853,
+        "cells_meeting_valid_fraction": 2,
+        "valid_native_pixels": 3986
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211130T044141_R033_T45RWL_20211130T180540",
+        "datetime": "2021-11-30T04:41:41.024000Z",
+        "mgrs_tile": "45RWL",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 29.585532,
+        "cells_meeting_valid_fraction": 169,
+        "valid_native_pixels": 835145
+      },
+      {
+        "item_id": "S2A_MSIL2A_20211130T044141_R033_T45RXK_20211130T165834",
+        "datetime": "2021-11-30T04:41:41.024000Z",
+        "mgrs_tile": "45RXK",
+        "processing_baseline": "03.00",
+        "catalog_cloud_cover_percent": 1.878047,
+        "cells_meeting_valid_fraction": 51,
+        "valid_native_pixels": 357024
+      }
+    ],
+    "cells_with_ndvi": 6589,
+    "cells_missing_ndvi": 801,
+    "missing_values_preserved": true,
+    "ndvi_min": -0.6217,
+    "ndvi_max": 0.885227,
+    "ndvi_mean_across_cells": 0.5345587732584611,
+    "accepted_acquisitions_per_cell_min": 1,
+    "accepted_acquisitions_per_cell_median": 2.0,
+    "accepted_acquisitions_per_cell_max": 11,
+    "maximum_observed_clear_fraction": 1.088858682220629
+  }
+}

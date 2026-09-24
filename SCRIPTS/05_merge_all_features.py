@@ -6,9 +6,53 @@ dataset to produce the complete 13-factor static dataset (Roy et al. 2025).
 Performs data quality audits, range sanity checks, and VIF multicollinearity tests.
 """
 
+import hashlib
+import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATASET_DIR = PROJECT_ROOT / "dataset"
+NDVI_PATH = DATASET_DIR / "features_ndvi_1km.csv"
+NDVI_METADATA_PATH = DATASET_DIR / "features_ndvi_1km.metadata.json"
+
+
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def validate_satellite_ndvi(base_df, ndvi_df):
+    """Reject synthetic/stale NDVI before it can enter the model dataset."""
+    if not NDVI_METADATA_PATH.is_file():
+        raise RuntimeError(
+            "NDVI provenance is missing. Run SCRIPTS/04_fetch_ndvi_features.py; "
+            "legacy synthetic NDVI files are not accepted."
+        )
+    metadata = json.loads(NDVI_METADATA_PATH.read_text(encoding="utf-8"))
+    if (
+        metadata.get("data_origin") != "satellite_observation"
+        or metadata.get("synthetic_fallback_used") is not False
+        or metadata.get("source", {}).get("collection") != "sentinel-2-l2a"
+    ):
+        raise RuntimeError("NDVI provenance does not identify genuine Sentinel-2 observations")
+    if metadata.get("output_sha256") != sha256_file(NDVI_PATH):
+        raise RuntimeError("NDVI CSV checksum does not match its satellite provenance sidecar")
+    if list(ndvi_df.columns) != ["cell_id", "ndvi_mean"]:
+        raise RuntimeError("NDVI CSV must contain exactly: cell_id, ndvi_mean")
+    if ndvi_df["cell_id"].isna().any() or ndvi_df["cell_id"].duplicated().any():
+        raise RuntimeError("NDVI cell_id values must be non-null and unique")
+    if ndvi_df["cell_id"].astype(str).tolist() != base_df["cell_id"].astype(str).tolist():
+        raise RuntimeError("NDVI cell_id rows are not exactly aligned with the base dataset")
+    valid_values = ndvi_df["ndvi_mean"].dropna()
+    if not valid_values.between(-1.0, 1.0).all():
+        raise RuntimeError("NDVI contains values outside the physical [-1, 1] range")
 
 def main():
     print("=== Step 5: Merging All Static Features into Master Dataset ===")
@@ -17,13 +61,14 @@ def main():
     clim_df = pd.read_csv("dataset/features_climatic_1km.csv")
     hydro_df = pd.read_csv("dataset/features_hydrology_faults_1km.csv")
     morph_df = pd.read_csv("dataset/features_morphometry_1km.csv")
-    ndvi_df = pd.read_csv("dataset/features_ndvi_1km.csv")
+    ndvi_df = pd.read_csv(NDVI_PATH)
+    validate_satellite_ndvi(base_df, ndvi_df)
     
     # Sequential joins on cell_id
     merged = base_df.merge(clim_df, on='cell_id', how='left')
     merged = merged.merge(hydro_df, on='cell_id', how='left')
     merged = merged.merge(morph_df, on='cell_id', how='left')
-    merged = merged.merge(ndvi_df, on='cell_id', how='left')
+    merged = merged.merge(ndvi_df, on='cell_id', how='left', validate='one_to_one')
     
     print(f"Merged master dataset shape: {merged.shape} (Expected rows: 7390)")
     
@@ -41,6 +86,12 @@ def main():
     
     # Run VIF Multicollinearity Analysis on the 13 Factors (Roy et al. 2025)
     print("\n=== Multicollinearity & VIF Analysis (Replicating Roy et al. 2025) ===")
+    try:
+        from statsmodels.stats.outliers_influence import variance_inflation_factor
+    except ModuleNotFoundError as error:
+        raise ModuleNotFoundError(
+            "The existing VIF step requires statsmodels; install it in the active environment."
+        ) from error
     # Filter to model eligible cells
     sub = merged[merged['model_eligible'] == True].copy()
     
