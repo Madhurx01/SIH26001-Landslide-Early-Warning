@@ -34,7 +34,7 @@ export default function SmsBroadcastModal({ onClose, activeAlert }) {
     corridor: currentCorridor,
     severity,
     headline: activeAlert?.headline || `${currentCorridor.name.toUpperCase()} - SEVERE LANDSLIDE WARNING`,
-    description: activeAlert?.message || `Extreme rainfall (>140mm) and SMAP saturation (>85%) have destabilized slope cuts. Immediate road transit suspension advised.`
+    description: activeAlert?.message || `The prototype Operational Risk Index is elevated using Open-Meteo model/API weather triggers. Verify conditions with field observations before issuing operational restrictions.`
   })
 
   const capXml = generateCapXml(capPayload)

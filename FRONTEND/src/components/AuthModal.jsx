@@ -397,7 +397,7 @@ export default function AuthModal({ open, onClose, currentUser, onLogin }) {
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#e2e8f0', marginTop: '2px' }}>Dr. P. Roy · Geological Survey Team</div>
                 <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '4px' }}>
-                  🔬 Research Authority: TreeSHAP Explainable AI Breakdown, 2021 Monsoon Timeline Replay, Satellite Hydrology.
+                  🔬 Research Authority: contextual risk-factor review, simulated 2021 monsoon timeline, and documented Open-Meteo weather inputs.
                 </div>
               </div>
             </div>

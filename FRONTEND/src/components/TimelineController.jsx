@@ -41,7 +41,7 @@ export default function TimelineController({ milestones, selectedDate, onSelectD
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9ec8b9', fontWeight: 700 }}>
-                DYNAMIC MONSOON TIMELINE · LAYER 2 EARLY WARNING RADAR
+                DEMONSTRATION TIMELINE · SIMULATED WEATHER SCENARIOS
               </span>
               <span style={{
                 background: currentMilestone.tag === 'EXTREME STORM' ? '#d7191c' : currentMilestone.tag === 'DRY BASELINE' ? '#2ca02c' : '#e16713',
@@ -146,11 +146,11 @@ export default function TimelineController({ milestones, selectedDate, onSelectD
             <div style={{ display: 'flex', gap: '1rem' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <CloudRain size={14} color="#26d0ce" />
-                State Mean 3-Day Rain: <strong>{meta.weather_summary.rainfall_3d} mm</strong>
+                Simulated 3-Day Rain: <strong>{meta.weather_summary.rainfall_3d_mm} mm</strong>
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <Droplets size={14} color="#5eead4" />
-                SMAP Soil Saturation: <strong>{meta.weather_summary.soil_moisture}%</strong>
+                Simulated Soil Moisture: <strong>{meta.weather_summary.soil_moisture_vwc_percent}% VWC</strong>
               </span>
             </div>
           )}
